@@ -8,13 +8,13 @@ public class CameraSwitch : MonoBehaviour
     public Camera firstPersonCamera;
     public Camera thirdPersonCamera;
     public Button switchButton;
-    private bool isFirstPerson = true;
+    private bool isFirstPerson = false;
 
     // Start is called before the first frame update
     void Start()
     {
-        firstPersonCamera.enabled = true;
-        thirdPersonCamera.enabled = false;
+        firstPersonCamera.enabled = false;
+        thirdPersonCamera.enabled = true;
 
         switchButton.onClick.AddListener(SwitchCamera);
     }

@@ -1,16 +1,17 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 public class FirstPersonCam : MonoBehaviour
 {
     public float sensitivity = 2.0f;
     public Transform cameraTransform;
-    public CharacterController characterController;
     public Transform characterTransform;
+    public RectTransform touchPanel;
 
     private float verticalRotation = 0f;
-    private bool isCursorLocked = true;
+    private bool isDragging = false;
 
     // Start is called before the first frame update
     void Start()
@@ -23,7 +24,7 @@ public class FirstPersonCam : MonoBehaviour
     void Update()
     {
         FollowCharacter();
-        HandleMouseLook();
+        HandleMouseDrag();
     }
 
     void FollowCharacter()
@@ -33,15 +34,31 @@ public class FirstPersonCam : MonoBehaviour
             transform.position = characterTransform.position;
         }
     }
-    void HandleMouseLook()
+    void HandleMouseDrag()
     {
-        float mouseX = Input.GetAxis("Mouse X") * sensitivity;
-        float mouseY = Input.GetAxis("Mouse Y") * sensitivity;
+        if (Input.GetMouseButtonDown(0) && IsPointerOverUIElement(touchPanel))
+        {
+            isDragging = true;
+        }
+        else if (Input.GetMouseButtonUp(0))
+        {
+            isDragging = false;
+        }
+        if (isDragging)
+        {
+            float mouseX = Input.GetAxis("Mouse X") * sensitivity;
+            float mouseY = Input.GetAxis("Mouse Y") * sensitivity;
 
-        verticalRotation -= mouseY;
-        verticalRotation = Mathf.Clamp(verticalRotation, -90f, 90f);
+            verticalRotation -= mouseY;
+            verticalRotation = Mathf.Clamp(verticalRotation, -90f, 90f);
 
-        cameraTransform.localRotation = Quaternion.Euler(verticalRotation, 0f, 0f);
-        transform.Rotate(Vector3.up * mouseX);
+            cameraTransform.localRotation = Quaternion.Euler(verticalRotation, 0f, 0f);
+            transform.Rotate(Vector3.up * mouseX);
+        }
+    }
+
+    bool IsPointerOverUIElement(RectTransform panel)
+    {
+        return EventSystem.current.IsPointerOverGameObject(); 
     }
 }
