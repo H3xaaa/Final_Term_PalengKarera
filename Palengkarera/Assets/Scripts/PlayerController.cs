@@ -1,5 +1,4 @@
-using System.Collections;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
@@ -19,18 +18,25 @@ public class PlayerController : MonoBehaviour
     public Image staminaBar; // UI element representing the stamina bar
     public Button runButton; // UI button used for running
 
-    private CharacterController characterController;
+    private Rigidbody rb;
     private Vector3 lastMoveDirection = Vector3.zero;
     private float currentStamina;
     private float rotationY;
     private bool isHoldingRun = false; // Tracks if the button is held
     private bool isRunning = false; // Tracks if the player is running
+    private Animator animator;
+
+    public Transform animationTarget; // Drag and drop the child object with the Animator in the inspector
 
     void Start()
     {
-        characterController = GetComponent<CharacterController>();
+        rb = GetComponent<Rigidbody>();
+        animator = animationTarget.GetComponent<Animator>(); // Assign animator from child object
         currentStamina = staminaMax; // Initialize stamina to full
         rotationY = transform.eulerAngles.y;
+
+        // Ensure Rigidbody is set up correctly
+        rb.freezeRotation = true; // Prevent rotation from physics
 
         // Add EventTrigger for the Run button
         EventTrigger trigger = runButton.gameObject.AddComponent<EventTrigger>();
@@ -57,48 +63,57 @@ public class PlayerController : MonoBehaviour
         float horizontal = joystick.Horizontal;
         float vertical = joystick.Vertical;
 
-        // Calculate the movement direction relative to the camera
         Vector3 moveInput = new Vector3(horizontal, 0, vertical);
         moveInput = Quaternion.Euler(0, cameraTransform.eulerAngles.y, 0) * moveInput;
 
-        // Determine the movement speed
-        if (moveInput.magnitude > 0.1f)
+        bool isMoving = moveInput.magnitude > 0.1f;
+
+        if (isMoving)
         {
-            isRunning = isHoldingRun && currentStamina > 0; // Run only if holding and stamina is available
+            isRunning = isHoldingRun && currentStamina > 0;
             lastMoveDirection = moveInput.normalized * (isRunning ? runSpeed : normalSpeed);
         }
         else
         {
-            lastMoveDirection = Vector3.Lerp(lastMoveDirection, Vector3.zero, Time.deltaTime * movementDamping);
+            lastMoveDirection = Vector3.zero;
         }
 
-        // Move the player
-        characterController.Move(lastMoveDirection * Time.deltaTime);
+        // 🔥 Instantly switch to the correct animation
+        if (animator != null)
+        {
+            if (isMoving)
+            {
+                animator.Play("Walk");  // 🔥 Instantly play Walk animation
+            }
+            else
+            {
+                animator.Play("Stand"); // 🔥 Instantly play Stand animation
+            }
+        }
 
-        // Handle stamina logic
         if (isRunning)
         {
             currentStamina -= staminaDepletionRate * Time.deltaTime;
-            if (currentStamina < 0)
-                currentStamina = 0;
+            if (currentStamina < 0) currentStamina = 0;
         }
         else if (!isHoldingRun && currentStamina < staminaMax)
         {
             currentStamina += staminaRechargeRate * Time.deltaTime;
-            if (currentStamina > staminaMax)
-                currentStamina = staminaMax;
+            if (currentStamina > staminaMax) currentStamina = staminaMax;
         }
 
-        // Update the stamina bar UI
         staminaBar.fillAmount = currentStamina / staminaMax;
 
-        // Handle player rotation
-        if (lastMoveDirection.magnitude > 0.1f)
+        if (isMoving)
         {
             Quaternion toRotation = Quaternion.LookRotation(lastMoveDirection);
-            rotationY = Mathf.LerpAngle(rotationY, cameraTransform.eulerAngles.y, rotationSpeed * Time.deltaTime);
-            Quaternion targetRotation = Quaternion.Euler(0, rotationY, 0);
-            transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, rotationSpeed * Time.deltaTime);
+            transform.rotation = Quaternion.Slerp(transform.rotation, toRotation, rotationSpeed * Time.deltaTime);
         }
+    }
+
+    void FixedUpdate()
+    {
+        // Apply movement using Rigidbody
+        rb.velocity = new Vector3(lastMoveDirection.x, rb.velocity.y, lastMoveDirection.z);
     }
 }
