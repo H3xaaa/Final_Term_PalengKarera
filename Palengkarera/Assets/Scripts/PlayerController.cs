@@ -22,7 +22,7 @@ public class PlayerController : MonoBehaviour
     private Vector3 lastMoveDirection = Vector3.zero;
     private float currentStamina;
     private float rotationY;
-    private bool isHoldingRun = false; // Tracks if the button is held
+    private bool isHoldingRunButton = false; // Only tracks UI button press
     private bool isRunning = false; // Tracks if the player is running
     private Animator animator;
 
@@ -46,7 +46,7 @@ public class PlayerController : MonoBehaviour
         {
             eventID = EventTriggerType.PointerDown
         };
-        pressEntry.callback.AddListener((data) => isHoldingRun = true);
+        pressEntry.callback.AddListener((data) => isHoldingRunButton = true);
         trigger.triggers.Add(pressEntry);
 
         // Detect button release (stop holding)
@@ -54,7 +54,7 @@ public class PlayerController : MonoBehaviour
         {
             eventID = EventTriggerType.PointerUp
         };
-        releaseEntry.callback.AddListener((data) => isHoldingRun = false);
+        releaseEntry.callback.AddListener((data) => isHoldingRunButton = false);
         trigger.triggers.Add(releaseEntry);
     }
 
@@ -67,6 +67,9 @@ public class PlayerController : MonoBehaviour
         moveInput = Quaternion.Euler(0, cameraTransform.eulerAngles.y, 0) * moveInput;
 
         bool isMoving = moveInput.magnitude > 0.1f;
+
+        // Running is only triggered if either Space is held or the button is held
+        bool isHoldingRun = Input.GetKey(KeyCode.Space) || isHoldingRunButton;
 
         if (isMoving)
         {
