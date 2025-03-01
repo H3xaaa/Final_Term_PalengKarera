@@ -1,122 +1,162 @@
 ﻿using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
+using Photon.Pun;
 
 public class PlayerController : MonoBehaviour
 {
-    public MobileJoystick joystick; // Reference to the joystick
-    public Transform cameraTransform; // Camera reference for movement direction
-    public float normalSpeed = 5f; // Movement speed while walking
-    public float runSpeed = 15f; // Movement speed while running
-    public float movementDamping = 5f; // Damping for movement transition
-    public float rotationSpeed = 10f; // Speed for smooth rotation
+    private MobileJoystick joystick;
+    private Transform cameraTransform;
+    private Image staminaBar;
+    private Button runButton;
 
-    public float staminaMax = 100f; // Maximum stamina value
-    public float staminaDepletionRate = 25f; // Rate at which stamina depletes while running
-    public float staminaRechargeRate = 25f; // Rate at which stamina recharges while not running
+    public float normalSpeed = 5f;
+    public float runSpeed = 15f;
+    public float rotationSpeed = 10f;
 
-    public Image staminaBar; // UI element representing the stamina bar
-    public Button runButton; // UI button used for running
+    public float staminaMax = 100f;
+    public float staminaDepletionRate = 25f;
+    public float staminaRechargeRate = 25f;
 
     private Rigidbody rb;
-    private Vector3 lastMoveDirection = Vector3.zero;
     private float currentStamina;
-    private float rotationY;
-    private bool isHoldingRunButton = false; // Only tracks UI button press
-    private bool isRunning = false; // Tracks if the player is running
+    private bool isHoldingRunButton = false;
     private Animator animator;
+    public Transform animationTarget; // Player model with Animator
 
-    public Transform animationTarget; // Drag and drop the child object with the Animator in the inspector
+    private PhotonView photonView;
+
+    void Awake()
+    {
+        rb = GetComponent<Rigidbody>();
+        photonView = GetComponent<PhotonView>();
+
+        if (animationTarget == null)
+        {
+            animationTarget = GetComponentInChildren<Animator>()?.transform;
+            if (animationTarget == null)
+                Debug.LogError("No animationTarget found! Assign it manually in the Inspector.");
+        }
+
+        animator = animationTarget?.GetComponent<Animator>();
+
+        currentStamina = staminaMax;
+        rb.freezeRotation = true;
+    }
 
     void Start()
     {
-        rb = GetComponent<Rigidbody>();
-        animator = animationTarget.GetComponent<Animator>(); // Assign animator from child object
-        currentStamina = staminaMax; // Initialize stamina to full
-        rotationY = transform.eulerAngles.y;
-
-        // Ensure Rigidbody is set up correctly
-        rb.freezeRotation = true; // Prevent rotation from physics
-
-        // Add EventTrigger for the Run button
-        EventTrigger trigger = runButton.gameObject.AddComponent<EventTrigger>();
-
-        // Detect button press (start holding)
-        EventTrigger.Entry pressEntry = new EventTrigger.Entry
+        if (photonView.IsMine)
         {
-            eventID = EventTriggerType.PointerDown
-        };
-        pressEntry.callback.AddListener((data) => isHoldingRunButton = true);
-        trigger.triggers.Add(pressEntry);
-
-        // Detect button release (stop holding)
-        EventTrigger.Entry releaseEntry = new EventTrigger.Entry
+            AssignUIElements();
+            AssignCamera();
+        }
+        else
         {
-            eventID = EventTriggerType.PointerUp
-        };
-        releaseEntry.callback.AddListener((data) => isHoldingRunButton = false);
-        trigger.triggers.Add(releaseEntry);
+            enabled = false;
+        }
+    }
+
+    void AssignUIElements()
+    {
+        GameObject uiCanvas = GameObject.Find("UI_Canvas");
+
+        if (uiCanvas)
+        {
+            Transform inGamePanel = uiCanvas.transform.Find("In-Game");
+            if (inGamePanel)
+            {
+                joystick = inGamePanel.transform.Find("Joystick")?.GetComponent<MobileJoystick>();
+            }
+
+            staminaBar = uiCanvas.transform.Find("StaminaBar")?.GetComponent<Image>();
+            runButton = uiCanvas.transform.Find("RightSideButtons/RunButton")?.GetComponent<Button>();
+
+            if (runButton)
+            {
+                EventTrigger trigger = runButton.gameObject.AddComponent<EventTrigger>();
+
+                EventTrigger.Entry pressEntry = new EventTrigger.Entry { eventID = EventTriggerType.PointerDown };
+                pressEntry.callback.AddListener((data) => isHoldingRunButton = true);
+                trigger.triggers.Add(pressEntry);
+
+                EventTrigger.Entry releaseEntry = new EventTrigger.Entry { eventID = EventTriggerType.PointerUp };
+                releaseEntry.callback.AddListener((data) => isHoldingRunButton = false);
+                trigger.triggers.Add(releaseEntry);
+            }
+        }
+        else
+        {
+            Debug.LogError("UI_Canvas not found! Make sure it's in the scene.");
+        }
+    }
+
+    void AssignCamera()
+    {
+        GameObject mainCamera = GameObject.FindWithTag("MainCamera");
+        if (mainCamera)
+        {
+            cameraTransform = mainCamera.transform;
+        }
+        else
+        {
+            Debug.LogError("MainCamera not found! Ensure the camera exists and has the correct tag.");
+        }
     }
 
     void Update()
     {
-        float horizontal = joystick.Horizontal;
-        float vertical = joystick.Vertical;
+        if (!photonView.IsMine || joystick == null || cameraTransform == null) return;
+
+        float horizontal = joystick.Horizontal + (Input.GetKey(KeyCode.A) ? -1f : 0f) + (Input.GetKey(KeyCode.D) ? 1f : 0f);
+        float vertical = joystick.Vertical + (Input.GetKey(KeyCode.W) ? 1f : 0f) + (Input.GetKey(KeyCode.S) ? -1f : 0f);
 
         Vector3 moveInput = new Vector3(horizontal, 0, vertical);
         moveInput = Quaternion.Euler(0, cameraTransform.eulerAngles.y, 0) * moveInput;
 
         bool isMoving = moveInput.magnitude > 0.1f;
+        bool isHoldingRun = isHoldingRunButton || Input.GetKey(KeyCode.LeftShift);
 
-        // Running is only triggered if either Space is held or the button is held
-        bool isHoldingRun = Input.GetKey(KeyCode.Space) || isHoldingRunButton;
+        float speed = isHoldingRun && currentStamina > 0 ? runSpeed : normalSpeed;
 
-        if (isMoving)
-        {
-            isRunning = isHoldingRun && currentStamina > 0;
-            lastMoveDirection = moveInput.normalized * (isRunning ? runSpeed : normalSpeed);
-        }
-        else
-        {
-            lastMoveDirection = Vector3.zero;
-        }
+        Vector3 moveVelocity = moveInput.normalized * speed;
+        moveVelocity.y = rb.velocity.y;
 
-        // 🔥 Instantly switch to the correct animation
+        rb.velocity = moveVelocity;
+
+        // **Updated Animation Logic**
         if (animator != null)
         {
             if (isMoving)
             {
-                animator.Play("Walk");  // 🔥 Instantly play Walk animation
+                animator.Play("Walk"); // Play Walk animation immediately when moving
             }
             else
             {
-                animator.Play("Stand"); // 🔥 Instantly play Stand animation
+                animator.Play("Stand"); // Play Stand animation immediately when stopping
             }
         }
 
-        if (isRunning)
+        // Handle stamina
+        if (isHoldingRun)
         {
             currentStamina -= staminaDepletionRate * Time.deltaTime;
             if (currentStamina < 0) currentStamina = 0;
         }
-        else if (!isHoldingRun && currentStamina < staminaMax)
+        else if (currentStamina < staminaMax)
         {
             currentStamina += staminaRechargeRate * Time.deltaTime;
-            if (currentStamina > staminaMax) currentStamina = staminaMax;
         }
 
-        staminaBar.fillAmount = currentStamina / staminaMax;
+        if (staminaBar)
+        {
+            staminaBar.fillAmount = currentStamina / staminaMax;
+        }
 
         if (isMoving)
         {
-            Quaternion toRotation = Quaternion.LookRotation(lastMoveDirection);
+            Quaternion toRotation = Quaternion.LookRotation(moveInput);
             transform.rotation = Quaternion.Slerp(transform.rotation, toRotation, rotationSpeed * Time.deltaTime);
         }
-    }
-
-    void FixedUpdate()
-    {
-        // Apply movement using Rigidbody
-        rb.velocity = new Vector3(lastMoveDirection.x, rb.velocity.y, lastMoveDirection.z);
     }
 }
