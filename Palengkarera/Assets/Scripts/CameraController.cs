@@ -1,18 +1,19 @@
 ﻿using UnityEngine;
 using UnityEngine.EventSystems;
-using UnityEngine.UI;
+using Photon.Pun;
 
 public class CameraController : MonoBehaviour, IDragHandler, IPointerDownHandler, IPointerUpHandler
 {
     [Header("Camera Settings")]
-    public Transform target; // Assign player object in Inspector
+    public Transform target; // The player
     public float sensitivity = 0.2f;
     public Vector2 rotationLimits = new Vector2(-30f, 60f);
     public float distanceFromTarget = 5f;
     public float heightOffset = 2f;
+    public float rotationSmoothing = 10f;
 
     [Header("UI Settings")]
-    public GameObject touchPanel; // Assign manually or automatically finds it
+    public GameObject touchPanel;
 
     private Vector2 rotation = Vector2.zero;
     private bool dragging = false;
@@ -32,10 +33,32 @@ public class CameraController : MonoBehaviour, IDragHandler, IPointerDownHandler
         {
             Debug.LogError("TouchPanel not found! Make sure it's active in the scene.");
         }
+
+        FindLocalPlayer();
     }
 
-    public void SetTarget(Transform newTarget) // 🔥 Added back this function
+    void FindLocalPlayer()
     {
+        GameObject[] players = GameObject.FindGameObjectsWithTag("Player"); // Ensure your player has the "Player" tag
+
+        foreach (GameObject player in players)
+        {
+            PhotonView playerPhotonView = player.GetComponent<PhotonView>();
+            if (playerPhotonView != null && playerPhotonView.IsMine)
+            {
+                SetTarget(player.transform);
+                Debug.Log("Camera assigned to: " + player.name);
+                return;
+            }
+        }
+
+        Debug.LogError("Local player not found!");
+    }
+
+    public void SetTarget(Transform newTarget)
+    {
+        if (newTarget == null) return;
+
         target = newTarget;
         rotation.y = target.eulerAngles.y; // Align with player's direction
     }
@@ -44,7 +67,14 @@ public class CameraController : MonoBehaviour, IDragHandler, IPointerDownHandler
     {
         EventTrigger eventTrigger = panel.GetComponent<EventTrigger>() ?? panel.AddComponent<EventTrigger>();
 
-        eventTrigger.triggers.Clear(); // Clear existing triggers
+        if (eventTrigger.triggers == null)
+        {
+            eventTrigger.triggers = new System.Collections.Generic.List<EventTrigger.Entry>();
+        }
+        else
+        {
+            eventTrigger.triggers.Clear();
+        }
 
         AddEventTrigger(eventTrigger, EventTriggerType.PointerDown, OnPointerDown);
         AddEventTrigger(eventTrigger, EventTriggerType.PointerUp, OnPointerUp);
@@ -76,8 +106,10 @@ public class CameraController : MonoBehaviour, IDragHandler, IPointerDownHandler
     {
         if (target == null) return;
 
-        Quaternion camRotation = Quaternion.Euler(rotation.x, rotation.y, 0);
-        transform.position = target.position - camRotation * Vector3.forward * distanceFromTarget + Vector3.up * heightOffset;
-        transform.rotation = camRotation;
+        Quaternion targetRotation = Quaternion.Euler(rotation.x, rotation.y, 0);
+        Vector3 desiredPosition = target.position - targetRotation * Vector3.forward * distanceFromTarget + Vector3.up * heightOffset;
+
+        transform.position = Vector3.Lerp(transform.position, desiredPosition, Time.deltaTime * rotationSmoothing);
+        transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.deltaTime * rotationSmoothing);
     }
 }

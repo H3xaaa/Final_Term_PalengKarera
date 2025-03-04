@@ -12,16 +12,16 @@ public class CreateAndJoin : MonoBehaviourPunCallbacks
     public TMP_Text displayText;
 
     [Header("Lobby UI")]
-    public TMP_InputField roomNameInputField; // Custom room name input
+    public TMP_InputField roomNameInputField;
     public TMP_InputField joinRoomInputField;
     public TextMeshProUGUI roomNameText;
-    public List<TextMeshProUGUI> playerSlots; // UI Slots for player names
+    public List<TextMeshProUGUI> playerSlots;
     public GameObject startGameButton;
 
     private void Start()
     {
-        PhotonNetwork.ConnectUsingSettings(); // Ensure player is connected to Photon
-        PhotonNetwork.AutomaticallySyncScene = true; // Enable automatic scene sync
+        PhotonNetwork.ConnectUsingSettings();
+        PhotonNetwork.AutomaticallySyncScene = true;
         startGameButton.SetActive(false);
         nameInputField.onValueChanged.AddListener(UpdateLobbyDisplay);
     }
@@ -53,7 +53,7 @@ public class CreateAndJoin : MonoBehaviourPunCallbacks
 
     public void CreateRoom()
     {
-        SetPlayerName(); // Ensure player name is set
+        SetPlayerName();
 
         if (string.IsNullOrEmpty(roomNameInputField.text))
         {
@@ -70,7 +70,7 @@ public class CreateAndJoin : MonoBehaviourPunCallbacks
 
     public void JoinRoom()
     {
-        SetPlayerName(); // Ensure player name is set
+        SetPlayerName();
 
         if (string.IsNullOrEmpty(joinRoomInputField.text))
         {
@@ -85,13 +85,11 @@ public class CreateAndJoin : MonoBehaviourPunCallbacks
     {
         Debug.Log("Joined Room: " + PhotonNetwork.CurrentRoom.Name);
 
-        // Update room name for non-host players
         roomNameText.text = "Room Name: " + PhotonNetwork.CurrentRoom.Name;
 
         UpdatePlayerList();
         CheckHost();
 
-        // Inform other players that someone joined
         photonView.RPC("SyncLobbyUI", RpcTarget.OthersBuffered);
     }
 
@@ -108,6 +106,7 @@ public class CreateAndJoin : MonoBehaviourPunCallbacks
     public override void OnPlayerLeftRoom(Player otherPlayer)
     {
         UpdatePlayerList();
+        CheckHost(); // Recheck if host left
     }
 
     void UpdatePlayerList()
@@ -117,7 +116,7 @@ public class CreateAndJoin : MonoBehaviourPunCallbacks
         for (int i = 0; i < playerSlots.Count; i++)
         {
             if (i < players.Length)
-                playerSlots[i].text = (i == 0) ? players[i].NickName + " (Host)" : players[i].NickName; // Mark Host
+                playerSlots[i].text = (i == 0) ? players[i].NickName + " (Host)" : players[i].NickName;
             else
                 playerSlots[i].text = "Waiting...";
         }
@@ -132,6 +131,8 @@ public class CreateAndJoin : MonoBehaviourPunCallbacks
     {
         if (PhotonNetwork.IsMasterClient)
         {
+            Debug.Log("Starting game...");
+            PhotonNetwork.CurrentRoom.IsOpen = false; // Lock the room
             photonView.RPC("LoadGameplayScene", RpcTarget.All);
         }
     }
@@ -139,12 +140,12 @@ public class CreateAndJoin : MonoBehaviourPunCallbacks
     [PunRPC]
     void LoadGameplayScene()
     {
-        PhotonNetwork.LoadLevel("Gameplay"); // Load scene for all players
+        PhotonNetwork.LoadLevel("Gameplay");
     }
 
     [PunRPC]
     void SyncLobbyUI()
     {
-        UpdatePlayerList(); // Ensure all players update their UI when someone joins
+        UpdatePlayerList();
     }
 }

@@ -3,7 +3,7 @@ using UnityEngine.EventSystems;
 using UnityEngine.UI;
 using Photon.Pun;
 
-public class PlayerController : MonoBehaviour
+public class PlayerController : MonoBehaviour, IPunInstantiateMagicCallback
 {
     private MobileJoystick joystick;
     private Transform cameraTransform;
@@ -26,35 +26,44 @@ public class PlayerController : MonoBehaviour
 
     private PhotonView photonView;
 
-    void Awake()
+    // ✅ Called when the player is instantiated in the network
+    public void OnPhotonInstantiate(PhotonMessageInfo info)
     {
-        rb = GetComponent<Rigidbody>();
-        photonView = GetComponent<PhotonView>();
+        photonView = GetComponent<PhotonView>(); // Ensure PhotonView is assigned
 
-        if (animationTarget == null)
-        {
-            animationTarget = GetComponentInChildren<Animator>()?.transform;
-            if (animationTarget == null)
-                Debug.LogError("No animationTarget found! Assign it manually in the Inspector.");
-        }
-
-        animator = animationTarget?.GetComponent<Animator>();
-
-        currentStamina = staminaMax;
-        rb.freezeRotation = true;
-    }
-
-    void Start()
-    {
         if (photonView.IsMine)
         {
             AssignUIElements();
             AssignCamera();
         }
+    }
+
+    void Awake()
+    {
+        rb = GetComponent<Rigidbody>();
+        photonView = GetComponent<PhotonView>(); // ✅ Fix: Assign PhotonView in Awake
+
+        if (!photonView.IsMine) // ✅ Only control the local player
+        {
+            rb.isKinematic = true; // Disable physics for non-local players
+            enabled = false;
+            return;
+        }
+
+        // ✅ Ensure we get the correct Animator from the "Character" child
+        Transform characterTransform = transform.Find("Character");
+        if (characterTransform)
+        {
+            animationTarget = characterTransform;
+            animator = characterTransform.GetComponent<Animator>();
+        }
         else
         {
-            enabled = false;
+            Debug.LogError("Character child not found! Ensure your prefab structure is correct.");
         }
+
+        currentStamina = staminaMax;
+        rb.freezeRotation = true;
     }
 
     void AssignUIElements()
@@ -91,28 +100,39 @@ public class PlayerController : MonoBehaviour
         }
     }
 
+    // ✅ Assigns the camera to follow this player
     void AssignCamera()
     {
         GameObject mainCamera = GameObject.FindWithTag("MainCamera");
+
         if (mainCamera)
         {
-            cameraTransform = mainCamera.transform;
+            CameraController cameraController = mainCamera.GetComponent<CameraController>();
+            if (cameraController)
+            {
+                cameraController.SetTarget(transform); // ✅ Camera follows the player
+            }
+            else
+            {
+                mainCamera.transform.SetParent(transform); // Attach camera to player as fallback
+                mainCamera.transform.localPosition = new Vector3(0, 2, -4);
+            }
         }
         else
         {
-            Debug.LogError("MainCamera not found! Ensure the camera exists and has the correct tag.");
+            Debug.LogError("MainCamera not found! Ensure it has the correct tag.");
         }
     }
 
     void Update()
     {
-        if (!photonView.IsMine || joystick == null || cameraTransform == null) return;
+        if (!photonView.IsMine || joystick == null) return;
 
         float horizontal = joystick.Horizontal + (Input.GetKey(KeyCode.A) ? -1f : 0f) + (Input.GetKey(KeyCode.D) ? 1f : 0f);
         float vertical = joystick.Vertical + (Input.GetKey(KeyCode.W) ? 1f : 0f) + (Input.GetKey(KeyCode.S) ? -1f : 0f);
 
         Vector3 moveInput = new Vector3(horizontal, 0, vertical);
-        moveInput = Quaternion.Euler(0, cameraTransform.eulerAngles.y, 0) * moveInput;
+        moveInput = Quaternion.Euler(0, Camera.main.transform.eulerAngles.y, 0) * moveInput;
 
         bool isMoving = moveInput.magnitude > 0.1f;
         bool isHoldingRun = isHoldingRunButton || Input.GetKey(KeyCode.LeftShift);
@@ -124,7 +144,7 @@ public class PlayerController : MonoBehaviour
 
         rb.velocity = moveVelocity;
 
-        // **Updated Animation Logic**
+        // ✅ **Animation Handling**
         if (animator != null)
         {
             if (isMoving)
@@ -137,7 +157,7 @@ public class PlayerController : MonoBehaviour
             }
         }
 
-        // Handle stamina
+        // ✅ **Handle stamina**
         if (isHoldingRun)
         {
             currentStamina -= staminaDepletionRate * Time.deltaTime;
@@ -153,10 +173,17 @@ public class PlayerController : MonoBehaviour
             staminaBar.fillAmount = currentStamina / staminaMax;
         }
 
+        // ✅ **Smooth Rotation**
         if (isMoving)
         {
             Quaternion toRotation = Quaternion.LookRotation(moveInput);
             transform.rotation = Quaternion.Slerp(transform.rotation, toRotation, rotationSpeed * Time.deltaTime);
         }
+    }
+
+    // ✅ Restored to fix errors in Spawner and NetworkManager
+    public void SetJoystick(MobileJoystick assignedJoystick)
+    {
+        joystick = assignedJoystick;
     }
 }
