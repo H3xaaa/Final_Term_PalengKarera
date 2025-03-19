@@ -2,6 +2,8 @@
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 using Photon.Pun;
+using System.Collections;
+using System.Collections.Generic;
 
 public class PlayerController : MonoBehaviour, IPunInstantiateMagicCallback
 {
@@ -125,6 +127,28 @@ public class PlayerController : MonoBehaviour, IPunInstantiateMagicCallback
             Debug.LogError("MainCamera not found! Ensure it has the correct tag.");
         }
     }
+
+    //Buff and Debuff
+    private List<Buff> activeBuffs = new List<Buff>();
+    public void ApplyBuff(Buff buff)
+    {
+        if (!activeBuffs.Contains(buff))
+        {
+            StartCoroutine(HandleBuff(buff));
+        }
+    }
+
+    private IEnumerator HandleBuff(Buff buff)
+    {
+        activeBuffs.Add(buff);
+        buff.Apply(this);
+
+        yield return new WaitForSeconds(buff.duration);
+
+        buff.Remove(this);
+        activeBuffs.Remove(buff);
+    }
+
 
     //Assign Random Trait
     void Start()
