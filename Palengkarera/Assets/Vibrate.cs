@@ -4,8 +4,12 @@ using UnityEngine;
 
 public class Vibrate : MonoBehaviour
 {
-    public void VibrateButton ()
+    public void VibrateButton()
     {
+#if UNITY_ANDROID || UNITY_IOS
         Handheld.Vibrate();
+#else
+        Debug.Log("Vibration not supported on this platform.");
+#endif
     }
 }
