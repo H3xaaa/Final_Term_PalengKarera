@@ -2,6 +2,8 @@
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 using Photon.Pun;
+using System.Collections;
+using System.Collections.Generic;
 
 public class PlayerController : MonoBehaviour, IPunInstantiateMagicCallback
 {
@@ -25,6 +27,8 @@ public class PlayerController : MonoBehaviour, IPunInstantiateMagicCallback
     public Transform animationTarget; // Player model with Animator
 
     private PhotonView photonView;
+
+    private Trait assignedTrait; // for Trait Assigning 
 
     // ✅ Called when the player is instantiated in the network
     public void OnPhotonInstantiate(PhotonMessageInfo info)
@@ -123,6 +127,85 @@ public class PlayerController : MonoBehaviour, IPunInstantiateMagicCallback
             Debug.LogError("MainCamera not found! Ensure it has the correct tag.");
         }
     }
+
+    //Buff and Debuff
+    private List<Buff> activeBuffs = new List<Buff>();
+    public void ApplyBuff(Buff buff)
+    {
+        if (!activeBuffs.Contains(buff))
+        {
+            StartCoroutine(HandleBuff(buff));
+        }
+    }
+
+    private IEnumerator HandleBuff(Buff buff)
+    {
+        activeBuffs.Add(buff);
+        buff.Apply(this);
+
+        yield return new WaitForSeconds(buff.duration);
+
+        buff.Remove(this);
+        activeBuffs.Remove(buff);
+    }
+
+
+    //Assign Random Trait
+    void Start()
+    {
+        AssignRandomTrait();
+        ApplyTraitEffects();
+    }
+
+    void AssignRandomTrait()
+    {
+        Debug.Log($"Traits Count: {TraitSystem.inGameTrait.Count}");
+
+        int randomIndex = Random.Range(0, TraitSystem.inGameTrait.Count);
+        assignedTrait = TraitSystem.inGameTrait[randomIndex];
+
+        if (assignedTrait != null)
+        {
+            Debug.Log($"Assigned Trait: {assignedTrait.Name}");
+        }
+        else
+        {
+            Debug.LogError("Trait Assignment Failed!");
+        }
+    }
+
+    void ApplyTraitEffects()
+    {
+        if (assignedTrait == null) return;
+
+        if (assignedTrait.Name == "Athletic")
+        {
+            float oldSpeed = normalSpeed;
+            normalSpeed = oldSpeed + 3f;
+            Debug.Log($"Movement Speed Increased: From {oldSpeed} to {normalSpeed}");
+        }
+        else if (assignedTrait.Name == "Locked In")
+        {
+            float oldStaminaDepletionRate = staminaDepletionRate;
+            staminaDepletionRate = oldStaminaDepletionRate - 10f;
+            Debug.Log($"Stamina Depletion Reduced: From {oldStaminaDepletionRate} to {staminaDepletionRate}");
+        }
+
+        #if UNITY_EDITOR
+        UnityEditor.EditorUtility.SetDirty(this);
+        #endif
+    }
+
+    public Trait GetTrait()
+    {
+        return assignedTrait;
+    }
+
+    public bool HasTrait(string traitName)
+    {
+        return assignedTrait != null && assignedTrait.Name == traitName; 
+    }
+
 
     void Update()
     {
