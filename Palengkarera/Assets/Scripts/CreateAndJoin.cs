@@ -18,11 +18,20 @@ public class CreateAndJoin : MonoBehaviourPunCallbacks
     public List<TextMeshProUGUI> playerSlots;
     public GameObject startGameButton;
 
+    [Header("UI Panels")]
+    public GameObject failedToJoinPanel;
+    public GameObject joinedRoomPanel;
+
     private void Start()
     {
         PhotonNetwork.ConnectUsingSettings();
         PhotonNetwork.AutomaticallySyncScene = true;
+
+        // Disable panels at the start
         startGameButton.SetActive(false);
+        failedToJoinPanel.SetActive(false);
+        joinedRoomPanel.SetActive(false);
+
         nameInputField.onValueChanged.AddListener(UpdateLobbyDisplay);
     }
 
@@ -90,12 +99,27 @@ public class CreateAndJoin : MonoBehaviourPunCallbacks
         UpdatePlayerList();
         CheckHost();
 
+        // Show the joined room panel and hide the failed panel
+        joinedRoomPanel.SetActive(true);
+        failedToJoinPanel.SetActive(false);
+
         photonView.RPC("SyncLobbyUI", RpcTarget.OthersBuffered);
     }
 
     public override void OnJoinRoomFailed(short returnCode, string message)
     {
         Debug.LogError("Failed to join room: " + message);
+
+        // Show the failed panel and hide the joined panel
+        failedToJoinPanel.SetActive(true);
+        joinedRoomPanel.SetActive(false);
+
+    }
+
+    // Hides the failed panel after 3 seconds
+    void HideFailedPanel()
+    {
+        failedToJoinPanel.SetActive(false);
     }
 
     public override void OnPlayerEnteredRoom(Player newPlayer)
