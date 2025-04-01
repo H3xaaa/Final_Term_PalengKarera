@@ -21,6 +21,7 @@ public class CreateAndJoin : MonoBehaviourPunCallbacks
     [Header("UI Panels")]
     public GameObject failedToJoinPanel;
     public GameObject joinedRoomPanel;
+    public GameObject disableOnClickPanel; // The panel to disable
 
     private void Start()
     {
@@ -31,6 +32,12 @@ public class CreateAndJoin : MonoBehaviourPunCallbacks
         startGameButton.SetActive(false);
         failedToJoinPanel.SetActive(false);
         joinedRoomPanel.SetActive(false);
+
+        if (disableOnClickPanel != null)
+        {
+            disableOnClickPanel.SetActive(false); // Ensure it starts disabled
+            Debug.Log("disableOnClickPanel is set to inactive at Start()");
+        }
 
         nameInputField.onValueChanged.AddListener(UpdateLobbyDisplay);
     }
@@ -70,6 +77,12 @@ public class CreateAndJoin : MonoBehaviourPunCallbacks
             return;
         }
 
+        if (disableOnClickPanel != null)
+        {
+            disableOnClickPanel.SetActive(false); // Ensure it stays disabled when creating a room
+            Debug.Log("disableOnClickPanel is disabled when creating a room.");
+        }
+
         string roomName = roomNameInputField.text;
         roomNameText.text = "Room Name: " + roomName;
 
@@ -103,6 +116,12 @@ public class CreateAndJoin : MonoBehaviourPunCallbacks
         joinedRoomPanel.SetActive(true);
         failedToJoinPanel.SetActive(false);
 
+        if (disableOnClickPanel != null)
+        {
+            disableOnClickPanel.SetActive(false); // Ensure it stays disabled after joining
+            Debug.Log("disableOnClickPanel remains disabled after joining a room.");
+        }
+
         photonView.RPC("SyncLobbyUI", RpcTarget.OthersBuffered);
     }
 
@@ -113,7 +132,6 @@ public class CreateAndJoin : MonoBehaviourPunCallbacks
         // Show the failed panel and hide the joined panel
         failedToJoinPanel.SetActive(true);
         joinedRoomPanel.SetActive(false);
-
     }
 
     // Hides the failed panel after 3 seconds
@@ -171,5 +189,14 @@ public class CreateAndJoin : MonoBehaviourPunCallbacks
     void SyncLobbyUI()
     {
         UpdatePlayerList();
+    }
+
+    public void DisablePanelOnClick()
+    {
+        if (disableOnClickPanel != null)
+        {
+            disableOnClickPanel.SetActive(false);
+            Debug.Log("disableOnClickPanel is now disabled by button click.");
+        }
     }
 }
