@@ -1,9 +1,10 @@
-﻿using UnityEngine;
+using UnityEngine;
 
-[CreateAssetMenu(fileName = "New Item", menuName = "ShoppingSystem/ItemData")]
+[CreateAssetMenu(fileName = "NewItemData", menuName = "Shopping/Item Data")]
 public class ItemData : ScriptableObject
 {
     public string itemName;
     public float price;
-    public int quantity;
+    public float averagePrice;
+    public int stock;
 }

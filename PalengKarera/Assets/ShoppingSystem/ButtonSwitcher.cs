@@ -3,15 +3,20 @@ using UnityEngine.UI;
 
 public class ButtonSwitcher : MonoBehaviour
 {
+    [Header("UI Buttons")]
     public GameObject pushButton; // Push Button
     public GameObject buyButton;  // Buy Button
+
+    [Header("Interaction Settings")]
     public float interactionDistance = 3f; // Detection distance
     public LayerMask interactableLayer; // Layer for interactable items
     public Transform playerCamera; // Camera or crosshair
 
-    // New Panels
+    [Header("Panels")]
     public GameObject mainPanel; // Main UI Panel
     public GameObject itemDescriptionPanel; // Item Description Panel
+
+    private ItemObject currentItemObject; // Cached item being looked at
 
     void Update()
     {
@@ -25,21 +30,25 @@ public class ButtonSwitcher : MonoBehaviour
 
         if (Physics.Raycast(ray, out hit, interactionDistance, interactableLayer))
         {
-            if (hit.collider.CompareTag("Item")) // Check if the item is detected
+            if (hit.collider.CompareTag("Item"))
             {
+                currentItemObject = hit.collider.GetComponent<ItemObject>();
                 ShowBuyButton();
-                if (Input.GetKeyDown(KeyCode.E)) // Optional: Press E to buy
+
+                if (Input.GetKeyDown(KeyCode.E)) // Optional key press
                 {
-                    BuyItem(); // Call BuyItem if E is pressed
+                    BuyItem();
                 }
             }
             else
             {
+                currentItemObject = null;
                 ShowPushButton();
             }
         }
         else
         {
+            currentItemObject = null;
             ShowPushButton();
         }
     }
@@ -56,17 +65,25 @@ public class ButtonSwitcher : MonoBehaviour
         buyButton.SetActive(false);
     }
 
-    // 👇 Call this when Buy Button is clicked
+    // Called when Buy Button is clicked
     public void BuyItem()
     {
-        Debug.Log("Buy button work");
-        ShowItemDescription();
+        if (currentItemObject != null)
+        {
+            Debug.Log("Buy button clicked on: " + currentItemObject.itemData.itemName);
+
+            // Send data to ShoppingUIManager to update UI panel
+            ShoppingUIManager.Instance.ShowItemDetails(currentItemObject.itemData);
+
+            // Show item description panel
+            ShowItemDescription();
+        }
     }
 
     void ShowItemDescription()
     {
-        mainPanel.SetActive(false); // Disable Main Panel
-        itemDescriptionPanel.SetActive(true); // Enable Item Description Panel
+        mainPanel.SetActive(false);
+        itemDescriptionPanel.SetActive(true);
     }
 
     public void CloseDescription()
