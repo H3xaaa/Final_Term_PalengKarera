@@ -15,4 +15,4 @@ MonoBehaviour:
   itemName: Meat
   price: 100
   averagePrice: 80
-  stock: 0
+  stock: 1000
