@@ -18,7 +18,6 @@ public class ShoppingListManager : MonoBehaviour
     public List<ShoppingRequirement> shoppingRequirements = new List<ShoppingRequirement>();
     public GameObject listItemPrefab;
     public Transform listPanel;
-    public TMP_Text dishNameText;
 
     private void Awake()
     {
@@ -32,13 +31,6 @@ public class ShoppingListManager : MonoBehaviour
 
     void DisplayShoppingList()
     {
-
-        // Show dish name from the GameObject name
-        if (dishNameText != null)
-        {
-            dishNameText.text = gameObject.name;
-        }
-
         foreach (Transform child in listPanel)
         {
             Destroy(child.gameObject);

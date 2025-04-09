@@ -16,3 +16,4 @@ MonoBehaviour:
   price: 100
   averagePrice: 80
   stock: 1000
+  unit: 2
