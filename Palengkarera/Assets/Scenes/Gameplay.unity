@@ -3532,12 +3532,19 @@ PrefabInstance:
     - {fileID: -8672503360663602918, guid: 041df6e6c948e3c439f17c3a1c117f6d, type: 3}
     - {fileID: -8734704173890467632, guid: 041df6e6c948e3c439f17c3a1c117f6d, type: 3}
     - {fileID: 5332238599137166870, guid: 041df6e6c948e3c439f17c3a1c117f6d, type: 3}
+    - {fileID: 3514220960872266841, guid: 041df6e6c948e3c439f17c3a1c117f6d, type: 3}
+    - {fileID: 4518201464205718925, guid: 041df6e6c948e3c439f17c3a1c117f6d, type: 3}
+    - {fileID: -8934277888318805918, guid: 041df6e6c948e3c439f17c3a1c117f6d, type: 3}
     m_AddedGameObjects: []
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: -8391222552659086748, guid: 041df6e6c948e3c439f17c3a1c117f6d,
         type: 3}
       insertIndex: -1
       addedObject: {fileID: 476472527}
+    - targetCorrespondingSourceObject: {fileID: -5446829454917964343, guid: 041df6e6c948e3c439f17c3a1c117f6d,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1783974033}
   m_SourcePrefab: {fileID: 100100000, guid: 041df6e6c948e3c439f17c3a1c117f6d, type: 3}
 --- !u!1 &1018117001
 GameObject:
@@ -7962,6 +7969,33 @@ MonoBehaviour:
   listItemPrefab: {fileID: 6308623572652302385, guid: a25e1c1b1c76834488c4232108985354,
     type: 3}
   listPanel: {fileID: 1328153244}
+--- !u!1 &1783974029 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: -5446829454917964343, guid: 041df6e6c948e3c439f17c3a1c117f6d,
+    type: 3}
+  m_PrefabInstance: {fileID: 956164171}
+  m_PrefabAsset: {fileID: 0}
+--- !u!65 &1783974033
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1783974029}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 0.20197277, y: 0.019772591, z: 0.018772008}
+  m_Center: {x: 0.08201962, y: 0.002480904, z: -0.00049727113}
 --- !u!1 &1792623423
 GameObject:
   m_ObjectHideFlags: 0
