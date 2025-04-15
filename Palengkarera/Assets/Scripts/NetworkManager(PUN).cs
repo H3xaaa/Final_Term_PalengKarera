@@ -5,12 +5,13 @@ using UnityEngine.SceneManagement;
 public class NetworkManager : MonoBehaviourPunCallbacks
 {
     public CameraController cameraController; // Assign in Inspector
+    public Transform spawnLocation;         // Set in Inspector for player spawn position
     private GameObject localPlayer;
 
     private void Start()
     {
         PhotonNetwork.ConnectUsingSettings();
-        SceneManager.sceneLoaded += OnSceneLoaded; // Subscribe to scene change
+        SceneManager.sceneLoaded += OnSceneLoaded; // Subscribe to scene changes
     }
 
     public override void OnConnectedToMaster()
@@ -35,7 +36,23 @@ public class NetworkManager : MonoBehaviourPunCallbacks
 
     void SpawnPlayer()
     {
-        GameObject player = PhotonNetwork.Instantiate("Player", new Vector3(Random.Range(-2, 2), 0, Random.Range(-2, 2)), Quaternion.identity);
+        Vector3 spawnPosition;
+        Quaternion spawnRotation;
+
+        if (spawnLocation != null)
+        {
+            spawnPosition = spawnLocation.position;
+            spawnRotation = spawnLocation.rotation;
+        }
+        else
+        {
+            spawnPosition = new Vector3(Random.Range(-2, 2), 0, Random.Range(-2, 2));
+            spawnRotation = Quaternion.identity;
+        }
+
+        // Instantiate the player using PhotonNetwork
+        GameObject player = PhotonNetwork.Instantiate("Player", spawnPosition, spawnRotation);
+        Debug.Log("Player spawned at: " + spawnPosition);
 
         if (player.GetComponent<PhotonView>().IsMine)
         {

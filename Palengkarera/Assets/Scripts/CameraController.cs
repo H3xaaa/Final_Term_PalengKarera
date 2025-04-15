@@ -25,14 +25,8 @@ public class CameraController : MonoBehaviour, IDragHandler, IPointerDownHandler
             touchPanel = GameObject.Find("TouchPanel");
         }
 
-        if (touchPanel)
-        {
-            AssignEventTriggers(touchPanel);
-        }
-        else
-        {
-            Debug.LogError("TouchPanel not found! Make sure it's active in the scene.");
-        }
+        // Uncomment this if you prefer to assign events by code:
+        //AssignEventTriggers(touchPanel);
 
         FindLocalPlayer();
     }
@@ -63,6 +57,45 @@ public class CameraController : MonoBehaviour, IDragHandler, IPointerDownHandler
         rotation.y = target.eulerAngles.y; // Align with player's direction
     }
 
+    // -- Inspector-Friendly Wrapper Methods Using BaseEventData --
+    public void HandlePointerDown(BaseEventData data)
+    {
+        OnPointerDown((PointerEventData)data);
+    }
+
+    public void HandlePointerUp(BaseEventData data)
+    {
+        OnPointerUp((PointerEventData)data);
+    }
+
+    public void HandleDrag(BaseEventData data)
+    {
+        OnDrag((PointerEventData)data);
+    }
+
+    // -- Interface Methods (Not visible in Inspector) --
+    public void OnPointerDown(PointerEventData eventData)
+    {
+        dragging = true;
+    }
+
+    public void OnPointerUp(PointerEventData eventData)
+    {
+        dragging = false;
+    }
+
+    public void OnDrag(PointerEventData eventData)
+    {
+        if (!dragging || target == null) return;
+
+        Vector2 dragDelta = eventData.delta;
+        rotation.x -= dragDelta.y * sensitivity;
+        rotation.y += dragDelta.x * sensitivity;
+
+        rotation.x = Mathf.Clamp(rotation.x, rotationLimits.x, rotationLimits.y);
+    }
+
+    // -- (Optional) Code to Assign Event Triggers Programmatically --
     void AssignEventTriggers(GameObject panel)
     {
         EventTrigger eventTrigger = panel.GetComponent<EventTrigger>() ?? panel.AddComponent<EventTrigger>();
@@ -76,30 +109,16 @@ public class CameraController : MonoBehaviour, IDragHandler, IPointerDownHandler
             eventTrigger.triggers.Clear();
         }
 
-        AddEventTrigger(eventTrigger, EventTriggerType.PointerDown, OnPointerDown);
-        AddEventTrigger(eventTrigger, EventTriggerType.PointerUp, OnPointerUp);
-        AddEventTrigger(eventTrigger, EventTriggerType.Drag, OnDrag);
+        AddEventTrigger(eventTrigger, EventTriggerType.PointerDown, HandlePointerDown);
+        AddEventTrigger(eventTrigger, EventTriggerType.PointerUp, HandlePointerUp);
+        AddEventTrigger(eventTrigger, EventTriggerType.Drag, HandleDrag);
     }
 
-    void AddEventTrigger(EventTrigger eventTrigger, EventTriggerType type, System.Action<PointerEventData> action)
+    void AddEventTrigger(EventTrigger eventTrigger, EventTriggerType type, System.Action<BaseEventData> action)
     {
         EventTrigger.Entry entry = new EventTrigger.Entry { eventID = type };
-        entry.callback.AddListener((data) => action.Invoke((PointerEventData)data));
+        entry.callback.AddListener((data) => action.Invoke(data));
         eventTrigger.triggers.Add(entry);
-    }
-
-    public void OnPointerDown(PointerEventData eventData) => dragging = true;
-    public void OnPointerUp(PointerEventData eventData) => dragging = false;
-
-    public void OnDrag(PointerEventData eventData)
-    {
-        if (!dragging || target == null) return;
-
-        Vector2 dragDelta = eventData.delta;
-        rotation.x -= dragDelta.y * sensitivity;
-        rotation.y += dragDelta.x * sensitivity;
-
-        rotation.x = Mathf.Clamp(rotation.x, rotationLimits.x, rotationLimits.y);
     }
 
     void LateUpdate()

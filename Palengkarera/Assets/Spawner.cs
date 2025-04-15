@@ -4,6 +4,7 @@ using Photon.Pun;
 public class Spawner : MonoBehaviour
 {
     public GameObject playerPrefab;
+    public Transform spawnPoint; // Set this in the Inspector
     private GameObject spawnedPlayer;
 
     void Start()
@@ -15,8 +16,22 @@ public class Spawner : MonoBehaviour
     {
         if (playerPrefab != null)
         {
-            Vector3 spawnPosition = new Vector3(Random.Range(-5f, 5f), 1f, Random.Range(-5f, 5f));
-            spawnedPlayer = PhotonNetwork.Instantiate(playerPrefab.name, spawnPosition, Quaternion.identity);
+            Vector3 spawnPosition;
+            Quaternion spawnRotation;
+
+            if (spawnPoint != null)
+            {
+                spawnPosition = spawnPoint.position;
+                spawnRotation = spawnPoint.rotation;
+            }
+            else
+            {
+                spawnPosition = new Vector3(Random.Range(-5f, 5f), 1f, Random.Range(-5f, 5f));
+                spawnRotation = Quaternion.identity;
+            }
+
+            spawnedPlayer = PhotonNetwork.Instantiate(playerPrefab.name, spawnPosition, spawnRotation);
+            Debug.Log("Spawned player at: " + spawnPosition);
 
             // Assign joystick to the PlayerController
             PlayerController playerController = spawnedPlayer.GetComponent<PlayerController>();
