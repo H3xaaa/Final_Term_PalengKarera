@@ -3,7 +3,47 @@ guid: 33a27ead6e440534b9d2ab1573387b07
 ModelImporter:
   serializedVersion: 22200
   internalIDToNameTable: []
-  externalObjects: {}
+  externalObjects:
+  - first:
+      type: UnityEngine:Texture2D
+      assembly: UnityEngine.CoreModule
+      name: Jasmine
+    second: {fileID: 2800000, guid: 4e1e1d2913aef6d488e6af836cb62ec2, type: 3}
+  - first:
+      type: UnityEngine:Texture2D
+      assembly: UnityEngine.CoreModule
+      name: Jasmine-sign
+    second: {fileID: 2800000, guid: d761acb7822c2864191efce1fbc7d0b1, type: 3}
+  - first:
+      type: UnityEngine:Texture2D
+      assembly: UnityEngine.CoreModule
+      name: Malagkit
+    second: {fileID: 2800000, guid: edff384e294af694c9038fa475384cd0, type: 3}
+  - first:
+      type: UnityEngine:Texture2D
+      assembly: UnityEngine.CoreModule
+      name: Malagkit-sign
+    second: {fileID: 2800000, guid: dbfe65fed4df614468d48077eae4fb1c, type: 3}
+  - first:
+      type: UnityEngine:Texture2D
+      assembly: UnityEngine.CoreModule
+      name: White Rice
+    second: {fileID: 2800000, guid: 39588e8f104a11140a73d32b18842e17, type: 3}
+  - first:
+      type: UnityEngine:Texture2D
+      assembly: UnityEngine.CoreModule
+      name: White-sign
+    second: {fileID: 2800000, guid: 122d7623c83186e4e9e259774509b093, type: 3}
+  - first:
+      type: UnityEngine:Texture2D
+      assembly: UnityEngine.CoreModule
+      name: ricee
+    second: {fileID: 2800000, guid: 4c3f7013963b1b748b6f38286f0c2693, type: 3}
+  - first:
+      type: UnityEngine:Texture2D
+      assembly: UnityEngine.CoreModule
+      name: timbangann
+    second: {fileID: 2800000, guid: de8570d099c5e914c9dc72b73ec883e3, type: 3}
   materials:
     materialImportMode: 2
     materialName: 0
