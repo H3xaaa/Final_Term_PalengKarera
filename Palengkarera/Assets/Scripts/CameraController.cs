@@ -10,7 +10,7 @@ public class CameraController : MonoBehaviour, IDragHandler, IPointerDownHandler
     public Vector2 rotationLimits = new Vector2(-30f, 60f);
     public float distanceFromTarget = 5f;
     public float heightOffset = 2f;
-    public float rotationSmoothing = 10f;
+    public float rotationSmoothing = 0.15f; // Reduced to lessen jitter
 
     [Header("UI Settings")]
     public GameObject touchPanel;
@@ -25,20 +25,20 @@ public class CameraController : MonoBehaviour, IDragHandler, IPointerDownHandler
             touchPanel = GameObject.Find("TouchPanel");
         }
 
-        // Uncomment this if you prefer to assign events by code:
-        //AssignEventTriggers(touchPanel);
+        // Optional: Uncomment to auto-assign touch event triggers in code
+        // AssignEventTriggers(touchPanel);
 
         FindLocalPlayer();
     }
 
     void FindLocalPlayer()
     {
-        GameObject[] players = GameObject.FindGameObjectsWithTag("Player"); // Ensure your player has the "Player" tag
+        GameObject[] players = GameObject.FindGameObjectsWithTag("Player");
 
         foreach (GameObject player in players)
         {
-            PhotonView playerPhotonView = player.GetComponent<PhotonView>();
-            if (playerPhotonView != null && playerPhotonView.IsMine)
+            PhotonView view = player.GetComponent<PhotonView>();
+            if (view != null && view.IsMine)
             {
                 SetTarget(player.transform);
                 Debug.Log("Camera assigned to: " + player.name);
@@ -54,10 +54,10 @@ public class CameraController : MonoBehaviour, IDragHandler, IPointerDownHandler
         if (newTarget == null) return;
 
         target = newTarget;
-        rotation.y = target.eulerAngles.y; // Align with player's direction
+        rotation.y = target.eulerAngles.y;
     }
 
-    // -- Inspector-Friendly Wrapper Methods Using BaseEventData --
+    // -- Inspector-Friendly Wrapper Methods --
     public void HandlePointerDown(BaseEventData data)
     {
         OnPointerDown((PointerEventData)data);
@@ -73,7 +73,7 @@ public class CameraController : MonoBehaviour, IDragHandler, IPointerDownHandler
         OnDrag((PointerEventData)data);
     }
 
-    // -- Interface Methods (Not visible in Inspector) --
+    // -- Unity EventSystem Interface Methods --
     public void OnPointerDown(PointerEventData eventData)
     {
         dragging = true;
@@ -95,19 +95,27 @@ public class CameraController : MonoBehaviour, IDragHandler, IPointerDownHandler
         rotation.x = Mathf.Clamp(rotation.x, rotationLimits.x, rotationLimits.y);
     }
 
-    // -- (Optional) Code to Assign Event Triggers Programmatically --
+    void LateUpdate()
+    {
+        if (target == null) return;
+
+        Quaternion targetRotation = Quaternion.Euler(rotation.x, rotation.y, 0);
+        Vector3 desiredPosition = target.position - targetRotation * Vector3.forward * distanceFromTarget + Vector3.up * heightOffset;
+
+        // Smooth follow (less aggressive to reduce jitter)
+        transform.position = Vector3.Lerp(transform.position, desiredPosition, rotationSmoothing);
+        transform.rotation = Quaternion.Lerp(transform.rotation, targetRotation, rotationSmoothing);
+    }
+
+    // -- Optional: Dynamic EventTrigger Setup (Editor Alternative) --
     void AssignEventTriggers(GameObject panel)
     {
         EventTrigger eventTrigger = panel.GetComponent<EventTrigger>() ?? panel.AddComponent<EventTrigger>();
 
         if (eventTrigger.triggers == null)
-        {
             eventTrigger.triggers = new System.Collections.Generic.List<EventTrigger.Entry>();
-        }
         else
-        {
             eventTrigger.triggers.Clear();
-        }
 
         AddEventTrigger(eventTrigger, EventTriggerType.PointerDown, HandlePointerDown);
         AddEventTrigger(eventTrigger, EventTriggerType.PointerUp, HandlePointerUp);
@@ -119,16 +127,5 @@ public class CameraController : MonoBehaviour, IDragHandler, IPointerDownHandler
         EventTrigger.Entry entry = new EventTrigger.Entry { eventID = type };
         entry.callback.AddListener((data) => action.Invoke(data));
         eventTrigger.triggers.Add(entry);
-    }
-
-    void LateUpdate()
-    {
-        if (target == null) return;
-
-        Quaternion targetRotation = Quaternion.Euler(rotation.x, rotation.y, 0);
-        Vector3 desiredPosition = target.position - targetRotation * Vector3.forward * distanceFromTarget + Vector3.up * heightOffset;
-
-        transform.position = Vector3.Lerp(transform.position, desiredPosition, Time.deltaTime * rotationSmoothing);
-        transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.deltaTime * rotationSmoothing);
     }
 }

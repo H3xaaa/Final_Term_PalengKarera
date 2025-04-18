@@ -72,6 +72,7 @@ public class ShoppingUIManager : MonoBehaviour
             currentItem.stock -= currentQty;
 
             ShoppingListManager.Instance.RegisterPurchase(currentItem, currentQty);
+            UpdateQtyDisplay();
 
             ShowItemDetails(currentItem); // Refresh UI after buying
         }

@@ -10,10 +10,9 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 1dadd4336aabb9d41b5260968cf30dda, type: 3}
-  m_Name: Meat
+  m_Name: Eggs
   m_EditorClassIdentifier: 
-  itemName: Meat
-  price: 100
-  averagePrice: 80
-  stock: 1000
-  unit: 2
+  itemName: Egg
+  price: 12
+  averagePrice: 15
+  stock: 15
