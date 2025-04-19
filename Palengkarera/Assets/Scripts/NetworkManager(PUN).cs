@@ -1,39 +1,81 @@
 ﻿using Photon.Pun;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using System.Collections;
 
+/// <summary>
+/// Handles Photon networking, player spawning, and optional intro animation.
+/// </summary>
 public class NetworkManager : MonoBehaviourPunCallbacks
 {
-    public CameraController cameraController; // Assign in Inspector
-    public Transform spawnLocation;         // Set in Inspector for player spawn position
+    [Header("Scene References")]
+    public CameraController cameraController; // Camera that follows the player
+    public Transform spawnLocation; // Optional: where the player will spawn
+    public GameObject introAnimationObject; // Object to show during intro
+    public float introWaitTime = 2f; // Time to wait before spawning player
+
     private GameObject localPlayer;
 
     private void Start()
     {
         PhotonNetwork.ConnectUsingSettings();
-        SceneManager.sceneLoaded += OnSceneLoaded; // Subscribe to scene changes
+        SceneManager.sceneLoaded += OnSceneLoaded;
     }
 
     public override void OnConnectedToMaster()
     {
-        PhotonNetwork.JoinOrCreateRoom("TestRoom", new Photon.Realtime.RoomOptions { MaxPlayers = 4 }, null);
+        PhotonNetwork.JoinOrCreateRoom(
+            "TestRoom",
+            new Photon.Realtime.RoomOptions { MaxPlayers = 4 },
+            null
+        );
     }
 
     public override void OnJoinedRoom()
     {
         Debug.Log("Joined Room!");
-        SpawnPlayer();
+        StartCoroutine(PlayIntroAndSpawn()); // Play intro before spawning
     }
 
     private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
         Debug.Log($"Scene Loaded: {scene.name}");
-        if (scene.name == "Gameplay") // Ensure it runs only in gameplay scene
+
+        if (scene.name == "Gameplay")
         {
-            SpawnPlayer();
+            StartCoroutine(PlayIntroAndSpawn()); // Play intro again on scene load
         }
     }
 
+    /// <summary>
+    /// Plays an optional intro animation, waits, then spawns the player.
+    /// </summary>
+    private IEnumerator PlayIntroAndSpawn()
+    {
+        // Enable intro animation if assigned
+        if (introAnimationObject != null)
+        {
+            introAnimationObject.SetActive(true);
+            Debug.Log("Intro animation started.");
+        }
+
+        // Wait for the defined intro time
+        yield return new WaitForSeconds(introWaitTime);
+
+        // Disable the intro animation after wait (optional)
+        if (introAnimationObject != null)
+        {
+            introAnimationObject.SetActive(false);
+            Debug.Log("Intro animation ended.");
+        }
+
+        // Proceed with spawning the player
+        SpawnPlayer();
+    }
+
+    /// <summary>
+    /// Spawns the networked player prefab and sets up camera and joystick.
+    /// </summary>
     void SpawnPlayer()
     {
         Vector3 spawnPosition;
@@ -50,7 +92,6 @@ public class NetworkManager : MonoBehaviourPunCallbacks
             spawnRotation = Quaternion.identity;
         }
 
-        // Instantiate the player using PhotonNetwork
         GameObject player = PhotonNetwork.Instantiate("Player", spawnPosition, spawnRotation);
         Debug.Log("Player spawned at: " + spawnPosition);
 
@@ -85,6 +126,6 @@ public class NetworkManager : MonoBehaviourPunCallbacks
 
     private void OnDestroy()
     {
-        SceneManager.sceneLoaded -= OnSceneLoaded; // Unsubscribe when destroyed
+        SceneManager.sceneLoaded -= OnSceneLoaded;
     }
 }
