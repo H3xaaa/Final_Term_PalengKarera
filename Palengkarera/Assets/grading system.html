@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Student Grade Calculator</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f7f8;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+    .container {
+      background: lightgray;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      width: 300px;
+    }
+    h2 {
+      text-align: center;
+      color: #333;
+      text
+
+    }
+    label {
+      display: block;
+      margin-top: 15px;
+      color: #444;
+    }
+    input {
+      width: 100%;
+      padding: 8px;
+      margin-top: 5px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+    }
+    button {
+      margin-top: 20px;
+      width: 100%;
+      padding: 10px;
+      border: none;
+      border-radius: 8px;
+      background-color: #4CAF50;
+      color: white;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #45a049;
+    }
+    .result {
+      margin-top: 20px;
+      font-weight: bold;
+      text-align: center;
+      color: #222;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <h2>Grade Calculator</h2>
+    <label for="attendance">Attendance (10%)</label>
+    <input type="number" id="attendance" max="100" min="0">
+
+    <label for="quiz">Quiz (20%)</label>
+    <input type="number" id="quiz" max="100" min="0">
+
+    <label for="seatwork">Seatwork (15%)</label>
+    <input type="number" id="seatwork" max="100" min="0">
+
+    <label for="project">Project (15%)</label>
+    <input type="number" id="project" max="100" min="0">
+
+    <label for="majorExam">Major Exam (40%)</label>
+    <input type="number" id="majorExam" max="100" min="0">
+
+    <button onclick="calculateFinalGrade()">Calculate</button>
+    <div class="result" id="result"></div>
+  </div>
+
+  <script>
+    function calculateFinalGrade() {
+      const attendance = parseFloat(document.getElementById('attendance').value) || 0;
+      const quiz = parseFloat(document.getElementById('quiz').value) || 0;
+      const seatwork = parseFloat(document.getElementById('seatwork').value) || 0;
+      const project = parseFloat(document.getElementById('project').value) || 0;
+      const majorExam = parseFloat(document.getElementById('majorExam').value) || 0;
+
+      const finalGrade = (attendance * 0.10) + 
+                         (quiz * 0.20) + 
+                         (seatwork * 0.15) + 
+                         (project * 0.15) + 
+                         (majorExam * 0.40);
+
+      let remark = "";
+      if (finalGrade === 100) {
+        remark = "Excellent";
+      } else if (finalGrade >= 90) {
+        remark = "Very Good";
+      } else if (finalGrade >= 80) {
+        remark = "Good";
+      } else if (finalGrade >= 75) {
+        remark = "Nice";
+      } else if (finalGrade >= 70) {
+        remark = "Fair";
+      } else {
+        remark = "Fail";
+      }
+
+      document.getElementById('result').textContent = 
+        Final Grade: ${finalGrade.toFixed(2)} - ${remark};
+    }
+  </script>
+
+</body>
+</html>

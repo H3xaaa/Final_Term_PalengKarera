@@ -122,6 +122,101 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
+--- !u!1 &18602261
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 18602262}
+  - component: {fileID: 18602264}
+  - component: {fileID: 18602263}
+  m_Layer: 5
+  m_Name: Text (Legacy)
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &18602262
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 18602261}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1403972894}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: 22, y: -132}
+  m_SizeDelta: {x: 697.97, y: 600.0825}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &18602263
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 18602261}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5f7201a12d95ffc409449d95f23cf332, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Material: {fileID: 0}
+  m_Color: {r: 0, g: 0, b: 0, a: 1}
+  m_RaycastTarget: 1
+  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_Maskable: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  m_FontData:
+    m_Font: {fileID: 12800000, guid: e00995507c2406448b4c8429136104dd, type: 3}
+    m_FontSize: 18
+    m_FontStyle: 1
+    m_BestFit: 0
+    m_MinSize: 0
+    m_MaxSize: 40
+    m_Alignment: 0
+    m_AlignByGeometry: 0
+    m_RichText: 1
+    m_HorizontalOverflow: 0
+    m_VerticalOverflow: 0
+    m_LineSpacing: 1
+  m_Text: "ABOUT US:\r\n\r\nWe are a group of student game developers from the University
+    of Caloocan City (South) taking the Bachelor of Science in Entertainment and
+    Multimedia Computing. This game serves as our project for our course. Our goal
+    was to teach the younger generation on how they can budget their money, how going
+    to palengke which is the filipino term for wet market usually goes, and also
+    to represent the filipino authentic dishes and setting to our players. \r\n\r\nWe
+    hope that through our game we were able to educate, represent, and entertain
+    our players by bringing them a game where they can have fun while also learning.\r\n\r\nThe
+    Developers:\r\nDe Guzman, Mark Eisen (Concept Designer)\r\nMapesos, Aldrin (Programmer)\r\nMagdaraog,
+    Fatima (3D Asset Artist)\r\nSam, Sean Jericho (Sound Engineer)\r\nAlorro, Cliford
+    (Sound Engineer)\r\nArgana, Jed Arjun (Concept Designer)\r\nAvenido, Jonard (Programmer)\r\nCanlas,
+    Aubrey Nicole (Concept Designer)\r\nClemente, Syrine Claire (Concept Designer)\r\nDeguit,
+    Jhonn Paul (Programmer)\r\nGenson, Gwyneth Yvonne (Artist)\r\nGerolaga, Adrian
+    Dave (3D Asset Artist)\r\nLaovinia, Leila Janine (Sound Engineer)\r\nLiobon,
+    Camille Jane (Sound Engineer)\r\nMedallon, Jharen (3D Asset Artist)\r\nNatividad,
+    Isaiah Daniel (Programmer)\r\nPalomo, Rae Adrian (Sound Engineer)\r\nRojo, Chris
+    Jericho (3D Asset Artist)\r\nTumbagahan, Jhon Mark (Programmer)\r\n"
+--- !u!222 &18602264
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 18602261}
+  m_CullTransparentMesh: 1
 --- !u!1 &45969930
 GameObject:
   m_ObjectHideFlags: 0
@@ -4587,7 +4682,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &663626456
 RectTransform:
   m_ObjectHideFlags: 0
@@ -5485,7 +5580,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &763231424
 RectTransform:
   m_ObjectHideFlags: 0
@@ -11749,6 +11844,7 @@ RectTransform:
   - {fileID: 1965301422}
   - {fileID: 2083266397}
   - {fileID: 895642070}
+  - {fileID: 18602262}
   m_Father: {fileID: 663626456}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
@@ -15863,6 +15959,7 @@ GameObject:
   - component: {fileID: 1830178201}
   - component: {fileID: 1830178200}
   - component: {fileID: 1830178199}
+  - component: {fileID: 1830178203}
   m_Layer: 5
   m_Name: Ready
   m_TagString: Untagged
@@ -16019,6 +16116,25 @@ RectTransform:
   m_AnchoredPosition: {x: -146, y: -161.3}
   m_SizeDelta: {x: 201.7594, y: 66.9281}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &1830178203
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1830178198}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a70ce8666430b794ba118ea5fc3de378, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  sounds:
+  - name: 
+    clip: {fileID: 0}
+    volume: 0
+    pitch: 0
+    loop: 0
+    source: {fileID: 0}
 --- !u!1 &1831371539
 GameObject:
   m_ObjectHideFlags: 0
@@ -16208,7 +16324,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &1844779589
 RectTransform:
   m_ObjectHideFlags: 0
@@ -20127,9 +20243,9 @@ SceneRoots:
   - {fileID: 1802398765}
   - {fileID: 1105870142}
   - {fileID: 131230277}
-  - {fileID: 724355541}
   - {fileID: 1567518505}
   - {fileID: 1910641313}
   - {fileID: 1977484473}
   - {fileID: 261350778}
   - {fileID: 1398666231}
+  - {fileID: 724355541}
