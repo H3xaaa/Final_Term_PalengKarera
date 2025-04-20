@@ -1,7 +1,9 @@
 ﻿using Photon.Pun;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 using System.Collections;
+using System.Collections.Generic;
 
 /// <summary>
 /// Handles Photon networking, player spawning, and optional intro animation.
@@ -9,10 +11,18 @@ using System.Collections;
 public class NetworkManager : MonoBehaviourPunCallbacks
 {
     [Header("Scene References")]
-    public CameraController cameraController; // Camera that follows the player
-    public Transform spawnLocation; // Optional: where the player will spawn
-    public GameObject introAnimationObject; // Object to show during intro
-    public float introWaitTime = 2f; // Time to wait before spawning player
+    public CameraController firstPersonCameraController; // First-person camera controller
+    public CameraController thirdPersonCameraController; // Third-person camera controller
+    public Transform spawnLocation;
+    public GameObject introAnimationObject;
+    public float introWaitTime = 2f;
+
+    [Header("Fade Image Before Spawn")]
+    public Image fadeImage;
+    public float fadeOutDuration = 1f;
+
+    [Header("Objects to Enable BEFORE Spawn")]
+    public List<GameObject> objectsToEnableBeforeSpawn;
 
     private GameObject localPlayer;
 
@@ -34,7 +44,7 @@ public class NetworkManager : MonoBehaviourPunCallbacks
     public override void OnJoinedRoom()
     {
         Debug.Log("Joined Room!");
-        StartCoroutine(PlayIntroAndSpawn()); // Play intro before spawning
+        StartCoroutine(PlayIntroAndSpawn());
     }
 
     private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
@@ -43,39 +53,58 @@ public class NetworkManager : MonoBehaviourPunCallbacks
 
         if (scene.name == "Gameplay")
         {
-            StartCoroutine(PlayIntroAndSpawn()); // Play intro again on scene load
+            StartCoroutine(PlayIntroAndSpawn());
         }
     }
 
-    /// <summary>
-    /// Plays an optional intro animation, waits, then spawns the player.
-    /// </summary>
     private IEnumerator PlayIntroAndSpawn()
     {
-        // Enable intro animation if assigned
+        // Show intro if exists
         if (introAnimationObject != null)
         {
             introAnimationObject.SetActive(true);
             Debug.Log("Intro animation started.");
         }
 
-        // Wait for the defined intro time
+        // Optional wait time before spawning
         yield return new WaitForSeconds(introWaitTime);
 
-        // Disable the intro animation after wait (optional)
         if (introAnimationObject != null)
         {
             introAnimationObject.SetActive(false);
             Debug.Log("Intro animation ended.");
         }
 
-        // Proceed with spawning the player
+        // Enable any additional pre-spawn objects
+        foreach (GameObject obj in objectsToEnableBeforeSpawn)
+        {
+            if (obj != null)
+                obj.SetActive(true);
+        }
+
+        // Spawn the player first
         SpawnPlayer();
+
+        // Fade out AFTER player has been spawned
+        if (fadeImage != null)
+        {
+            fadeImage.gameObject.SetActive(true);
+            Color color = fadeImage.color;
+            float time = 0f;
+
+            while (time < fadeOutDuration)
+            {
+                float alpha = Mathf.Lerp(1f, 0f, time / fadeOutDuration);
+                fadeImage.color = new Color(color.r, color.g, color.b, alpha);
+                time += Time.deltaTime;
+                yield return null;
+            }
+
+            fadeImage.color = new Color(color.r, color.g, color.b, 0f);
+            fadeImage.gameObject.SetActive(false);
+        }
     }
 
-    /// <summary>
-    /// Spawns the networked player prefab and sets up camera and joystick.
-    /// </summary>
     void SpawnPlayer()
     {
         Vector3 spawnPosition;
@@ -99,18 +128,20 @@ public class NetworkManager : MonoBehaviourPunCallbacks
         {
             localPlayer = player;
 
-            // Assign camera
-            if (cameraController != null)
+            // Assign cameras to player
+            if (firstPersonCameraController != null && thirdPersonCameraController != null)
             {
-                cameraController.SetTarget(localPlayer.transform);
-                Debug.Log("Camera assigned to player.");
+                // Assuming you want to switch between cameras after spawning
+                firstPersonCameraController.SetTarget(localPlayer.transform);
+                thirdPersonCameraController.SetTarget(localPlayer.transform);
+                Debug.Log("First-person and third-person cameras assigned to player.");
             }
             else
             {
-                Debug.LogError("CameraController is not assigned in NetworkManager.");
+                Debug.LogError("One or both CameraControllers are not assigned in NetworkManager.");
             }
 
-            // Assign Joystick Controls
+            // Assign joystick to player
             MobileJoystick joystick = FindObjectOfType<MobileJoystick>();
             if (joystick != null)
             {

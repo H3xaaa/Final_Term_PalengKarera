@@ -25,9 +25,6 @@ public class CameraController : MonoBehaviour, IDragHandler, IPointerDownHandler
             touchPanel = GameObject.Find("TouchPanel");
         }
 
-        // Optional: Uncomment to auto-assign touch event triggers in code
-        // AssignEventTriggers(touchPanel);
-
         FindLocalPlayer();
     }
 
@@ -76,16 +73,34 @@ public class CameraController : MonoBehaviour, IDragHandler, IPointerDownHandler
     // -- Unity EventSystem Interface Methods --
     public void OnPointerDown(PointerEventData eventData)
     {
+        // Check if the touchPanel is disabled (or inactive)
+        if (touchPanel != null && !touchPanel.activeInHierarchy)
+        {
+            return; // If touchPanel is not active, don't process the touch event
+        }
+
         dragging = true;
     }
 
     public void OnPointerUp(PointerEventData eventData)
     {
+        // Check if the touchPanel is disabled (or inactive)
+        if (touchPanel != null && !touchPanel.activeInHierarchy)
+        {
+            return; // If touchPanel is not active, don't process the touch event
+        }
+
         dragging = false;
     }
 
     public void OnDrag(PointerEventData eventData)
     {
+        // Check if the touchPanel is disabled (or inactive)
+        if (touchPanel != null && !touchPanel.activeInHierarchy)
+        {
+            return; // If touchPanel is not active, don't process the drag event
+        }
+
         if (!dragging || target == null) return;
 
         Vector2 dragDelta = eventData.delta;
