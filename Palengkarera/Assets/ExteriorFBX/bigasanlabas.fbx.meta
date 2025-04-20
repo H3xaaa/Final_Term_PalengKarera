@@ -1,19 +1,54 @@
 fileFormatVersion: 2
-guid: 251330553331b4d459e87f936c35a76f
+guid: e726afb4b389bc44482e8caa68f5f4c8
 ModelImporter:
   serializedVersion: 22200
   internalIDToNameTable: []
   externalObjects:
   - first:
-      type: UnityEngine:Material
+      type: UnityEngine:Texture2D
       assembly: UnityEngine.CoreModule
-      name: Material.179
-    second: {fileID: 2100000, guid: cb5a70d694bf723408ef1c13ac6f3ef5, type: 2}
+      name: Jasmine
+    second: {fileID: 2800000, guid: f88c2235fc09bf443ae971565cec9036, type: 3}
   - first:
       type: UnityEngine:Texture2D
       assembly: UnityEngine.CoreModule
-      name: roof
-    second: {fileID: 2800000, guid: bde28cd7245a79341875aa4f6654355f, type: 3}
+      name: Jasmine-sign
+    second: {fileID: 2800000, guid: 8514ab03f9edc5f468d2dc02a841beae, type: 3}
+  - first:
+      type: UnityEngine:Texture2D
+      assembly: UnityEngine.CoreModule
+      name: Malagkit
+    second: {fileID: 2800000, guid: a8173e746c08e2d4a8d9b46a74a242f1, type: 3}
+  - first:
+      type: UnityEngine:Texture2D
+      assembly: UnityEngine.CoreModule
+      name: Malagkit-sign
+    second: {fileID: 2800000, guid: d8b06834ad21e6842a077a79f72879d3, type: 3}
+  - first:
+      type: UnityEngine:Texture2D
+      assembly: UnityEngine.CoreModule
+      name: White Rice
+    second: {fileID: 2800000, guid: 2992f3bf9e4a50f4bb31fd10b484c753, type: 3}
+  - first:
+      type: UnityEngine:Texture2D
+      assembly: UnityEngine.CoreModule
+      name: White-sign
+    second: {fileID: 2800000, guid: 39bbf5aa1dc99ce4f9e64d97466ca8cd, type: 3}
+  - first:
+      type: UnityEngine:Texture2D
+      assembly: UnityEngine.CoreModule
+      name: ricee
+    second: {fileID: 2800000, guid: 6e9301005b3d17c419f48815b4d0e040, type: 3}
+  - first:
+      type: UnityEngine:Texture2D
+      assembly: UnityEngine.CoreModule
+      name: roof2
+    second: {fileID: 2800000, guid: ba58085bd4875f647a7a17bac7039d16, type: 3}
+  - first:
+      type: UnityEngine:Texture2D
+      assembly: UnityEngine.CoreModule
+      name: timbangann
+    second: {fileID: 2800000, guid: d0b875680f8be4742b4b02dd32dd76ff, type: 3}
   materials:
     materialImportMode: 2
     materialName: 0

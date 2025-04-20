@@ -1,19 +1,9 @@
 fileFormatVersion: 2
-guid: 251330553331b4d459e87f936c35a76f
+guid: 583b70a8f1ee8f440845ee15781db098
 ModelImporter:
   serializedVersion: 22200
   internalIDToNameTable: []
-  externalObjects:
-  - first:
-      type: UnityEngine:Material
-      assembly: UnityEngine.CoreModule
-      name: Material.179
-    second: {fileID: 2100000, guid: cb5a70d694bf723408ef1c13ac6f3ef5, type: 2}
-  - first:
-      type: UnityEngine:Texture2D
-      assembly: UnityEngine.CoreModule
-      name: roof
-    second: {fileID: 2800000, guid: bde28cd7245a79341875aa4f6654355f, type: 3}
+  externalObjects: {}
   materials:
     materialImportMode: 2
     materialName: 0
