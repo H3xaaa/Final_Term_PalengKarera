@@ -3041,6 +3041,11 @@ PrefabInstance:
       propertyPath: m_Height
       value: 2
       objectReference: {fileID: 0}
+    - target: {fileID: 5238532608094822904, guid: adab6e363c043c64e8112e40cc0b5502,
+        type: 3}
+      propertyPath: m_BaseOffset
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 6163474452702780840, guid: adab6e363c043c64e8112e40cc0b5502,
         type: 3}
       propertyPath: moveSpeed
@@ -4874,6 +4879,11 @@ PrefabInstance:
       propertyPath: m_Height
       value: 2
       objectReference: {fileID: 0}
+    - target: {fileID: 5238532608094822904, guid: adab6e363c043c64e8112e40cc0b5502,
+        type: 3}
+      propertyPath: m_BaseOffset
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 6163474452702780840, guid: adab6e363c043c64e8112e40cc0b5502,
         type: 3}
       propertyPath: moveSpeed
@@ -5489,6 +5499,11 @@ PrefabInstance:
       propertyPath: m_Height
       value: 2
       objectReference: {fileID: 0}
+    - target: {fileID: 5238532608094822904, guid: adab6e363c043c64e8112e40cc0b5502,
+        type: 3}
+      propertyPath: m_BaseOffset
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 6163474452702780840, guid: adab6e363c043c64e8112e40cc0b5502,
         type: 3}
       propertyPath: moveSpeed
@@ -5571,6 +5586,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Height
       value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 5238532608094822904, guid: adab6e363c043c64e8112e40cc0b5502,
+        type: 3}
+      propertyPath: m_BaseOffset
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6163474452702780840, guid: adab6e363c043c64e8112e40cc0b5502,
         type: 3}
@@ -7911,6 +7931,11 @@ PrefabInstance:
       propertyPath: m_Height
       value: 2
       objectReference: {fileID: 0}
+    - target: {fileID: 5238532608094822904, guid: adab6e363c043c64e8112e40cc0b5502,
+        type: 3}
+      propertyPath: m_BaseOffset
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 6163474452702780840, guid: adab6e363c043c64e8112e40cc0b5502,
         type: 3}
       propertyPath: moveSpeed
@@ -8149,6 +8174,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Height
       value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 5238532608094822904, guid: adab6e363c043c64e8112e40cc0b5502,
+        type: 3}
+      propertyPath: m_BaseOffset
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6163474452702780840, guid: adab6e363c043c64e8112e40cc0b5502,
         type: 3}
@@ -10376,6 +10406,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Height
       value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 5238532608094822904, guid: adab6e363c043c64e8112e40cc0b5502,
+        type: 3}
+      propertyPath: m_BaseOffset
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6163474452702780840, guid: adab6e363c043c64e8112e40cc0b5502,
         type: 3}
@@ -14069,6 +14104,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Height
       value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 5238532608094822904, guid: adab6e363c043c64e8112e40cc0b5502,
+        type: 3}
+      propertyPath: m_BaseOffset
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6163474452702780840, guid: adab6e363c043c64e8112e40cc0b5502,
         type: 3}
@@ -18943,6 +18983,11 @@ PrefabInstance:
       propertyPath: m_Height
       value: 2
       objectReference: {fileID: 0}
+    - target: {fileID: 5238532608094822904, guid: adab6e363c043c64e8112e40cc0b5502,
+        type: 3}
+      propertyPath: m_BaseOffset
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 6163474452702780840, guid: adab6e363c043c64e8112e40cc0b5502,
         type: 3}
       propertyPath: moveSpeed
@@ -22881,6 +22926,11 @@ PrefabInstance:
       propertyPath: m_Height
       value: 2
       objectReference: {fileID: 0}
+    - target: {fileID: 5238532608094822904, guid: adab6e363c043c64e8112e40cc0b5502,
+        type: 3}
+      propertyPath: m_BaseOffset
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 6163474452702780840, guid: adab6e363c043c64e8112e40cc0b5502,
         type: 3}
       propertyPath: moveSpeed
@@ -25830,6 +25880,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Height
       value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 5238532608094822904, guid: adab6e363c043c64e8112e40cc0b5502,
+        type: 3}
+      propertyPath: m_BaseOffset
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6163474452702780840, guid: adab6e363c043c64e8112e40cc0b5502,
         type: 3}
