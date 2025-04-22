@@ -35,7 +35,7 @@ public class CreateAndJoin : MonoBehaviourPunCallbacks
 
         if (disableOnClickPanel != null)
         {
-            disableOnClickPanel.SetActive(false); // Ensure it starts disabled
+            disableOnClickPanel.SetActive(false);
             Debug.Log("disableOnClickPanel is set to inactive at Start()");
         }
 
@@ -79,7 +79,7 @@ public class CreateAndJoin : MonoBehaviourPunCallbacks
 
         if (disableOnClickPanel != null)
         {
-            disableOnClickPanel.SetActive(false); // Ensure it stays disabled when creating a room
+            disableOnClickPanel.SetActive(false);
             Debug.Log("disableOnClickPanel is disabled when creating a room.");
         }
 
@@ -112,13 +112,12 @@ public class CreateAndJoin : MonoBehaviourPunCallbacks
         UpdatePlayerList();
         CheckHost();
 
-        // Show the joined room panel and hide the failed panel
         joinedRoomPanel.SetActive(true);
         failedToJoinPanel.SetActive(false);
 
         if (disableOnClickPanel != null)
         {
-            disableOnClickPanel.SetActive(false); // Ensure it stays disabled after joining
+            disableOnClickPanel.SetActive(false);
             Debug.Log("disableOnClickPanel remains disabled after joining a room.");
         }
 
@@ -129,12 +128,13 @@ public class CreateAndJoin : MonoBehaviourPunCallbacks
     {
         Debug.LogError("Failed to join room: " + message);
 
-        // Show the failed panel and hide the joined panel
         failedToJoinPanel.SetActive(true);
         joinedRoomPanel.SetActive(false);
+
+        // Optional: hide after delay
+        Invoke("HideFailedPanel", 3f);
     }
 
-    // Hides the failed panel after 3 seconds
     void HideFailedPanel()
     {
         failedToJoinPanel.SetActive(false);
@@ -148,7 +148,7 @@ public class CreateAndJoin : MonoBehaviourPunCallbacks
     public override void OnPlayerLeftRoom(Player otherPlayer)
     {
         UpdatePlayerList();
-        CheckHost(); // Recheck if host left
+        CheckHost();
     }
 
     void UpdatePlayerList()
@@ -198,5 +198,18 @@ public class CreateAndJoin : MonoBehaviourPunCallbacks
             disableOnClickPanel.SetActive(false);
             Debug.Log("disableOnClickPanel is now disabled by button click.");
         }
+    }
+
+    public override void OnLeftRoom()
+    {
+        Debug.Log("Left the room. Resetting lobby UI...");
+
+        roomNameText.text = "Room Name:";
+        foreach (var slot in playerSlots)
+            slot.text = "Waiting...";
+
+        startGameButton.SetActive(false);
+        joinedRoomPanel.SetActive(false);
+        failedToJoinPanel.SetActive(false);
     }
 }

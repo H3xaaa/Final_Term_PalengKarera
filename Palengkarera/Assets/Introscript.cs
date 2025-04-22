@@ -2,6 +2,7 @@
 using UnityEngine.UI;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEngine.SceneManagement;
 
 public class Introscript : MonoBehaviour
 {
@@ -27,11 +28,12 @@ public class Introscript : MonoBehaviour
 
     private void OnEnable()
     {
-        // Store and disable previous main camera
+        // Destroy leftover main camera from previous scene if not the introCamera
         if (Camera.main != null && Camera.main != introCamera)
         {
             previousMainCamera = Camera.main;
-            previousMainCamera.enabled = false;
+            Debug.Log("Destroying leftover main camera: " + previousMainCamera.name);
+            Destroy(previousMainCamera.gameObject);
         }
 
         // Set intro camera as main
@@ -39,6 +41,7 @@ public class Introscript : MonoBehaviour
         {
             introCamera.enabled = true;
             introCamera.tag = "MainCamera";
+            Debug.Log("Intro camera enabled: " + introCamera.name);
         }
 
         // Play intro animation using Animator
@@ -57,6 +60,15 @@ public class Introscript : MonoBehaviour
         {
             audioSource.clip = introSound;
             audioSource.Play();
+            Debug.Log("Playing intro sound: " + introSound.name);
+        }
+        else if (audioSource == null)
+        {
+            Debug.LogWarning("Audio Source is not assigned.");
+        }
+        else if (introSound == null)
+        {
+            Debug.LogWarning("Intro Sound is not assigned.");
         }
 
         // Begin intro sequence
@@ -90,18 +102,12 @@ public class Introscript : MonoBehaviour
         foreach (GameObject go in objectsToDisable)
             if (go != null) go.SetActive(false);
 
-        // Restore previous main camera
-        if (previousMainCamera != null)
-        {
-            previousMainCamera.enabled = true;
-            previousMainCamera.tag = "MainCamera";
-        }
-
         // Disable intro camera
         if (introCamera != null)
         {
             introCamera.enabled = false;
             introCamera.tag = "Untagged";
+            Debug.Log("Intro camera disabled.");
         }
 
         // Deactivate this script's GameObject
