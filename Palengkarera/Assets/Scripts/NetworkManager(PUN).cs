@@ -6,13 +6,13 @@ using System.Collections;
 using System.Collections.Generic;
 
 /// <summary>
-/// Handles Photon networking, player spawning, and optional intro animation.
+/// Handles Photon networking, scene loading, intro animation, fade, and player spawning.
 /// </summary>
 public class NetworkManager : MonoBehaviourPunCallbacks
 {
     [Header("Scene References")]
-    public CameraController firstPersonCameraController; // First-person camera controller
-    public CameraController thirdPersonCameraController; // Third-person camera controller
+    public CameraController firstPersonCameraController;
+    public CameraController thirdPersonCameraController;
     public Transform spawnLocation;
     public GameObject introAnimationObject;
     public float introWaitTime = 2f;
@@ -24,10 +24,17 @@ public class NetworkManager : MonoBehaviourPunCallbacks
     [Header("Objects to Enable BEFORE Spawn")]
     public List<GameObject> objectsToEnableBeforeSpawn;
 
+    [Header("Player Settings")]
+    public GameObject playerPrefab; // Drag your Player prefab here
+    public Transform customSpawnPoint; // Optional spawn point override
+
     private GameObject localPlayer;
 
     private void Start()
     {
+        Debug.Log("NetworkManager Start method called.");
+        StartCoroutine(PlayIntroAndSpawn());
+
         PhotonNetwork.ConnectUsingSettings();
         SceneManager.sceneLoaded += OnSceneLoaded;
     }
@@ -44,48 +51,52 @@ public class NetworkManager : MonoBehaviourPunCallbacks
     public override void OnJoinedRoom()
     {
         Debug.Log("Joined Room!");
-        StartCoroutine(PlayIntroAndSpawn());
     }
 
     private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
         Debug.Log($"Scene Loaded: {scene.name}");
+        StartCoroutine(PlayIntroAndSpawn());
 
         if (scene.name == "Gameplay")
         {
-            StartCoroutine(PlayIntroAndSpawn());
+            Debug.Log("Starting intro and spawning...");
         }
     }
 
     private IEnumerator PlayIntroAndSpawn()
     {
-        // Show intro if exists
+        Debug.Log("Intro animation started.");
         if (introAnimationObject != null)
         {
             introAnimationObject.SetActive(true);
-            Debug.Log("Intro animation started.");
         }
 
-        // Optional wait time before spawning
+        Debug.Log($"Waiting for {introWaitTime} seconds...");
         yield return new WaitForSeconds(introWaitTime);
 
+        Debug.Log("Intro wait time completed, disabling intro animation.");
         if (introAnimationObject != null)
         {
             introAnimationObject.SetActive(false);
-            Debug.Log("Intro animation ended.");
         }
 
-        // Enable any additional pre-spawn objects
         foreach (GameObject obj in objectsToEnableBeforeSpawn)
         {
             if (obj != null)
+            {
                 obj.SetActive(true);
+                Debug.Log($"Enabled: {obj.name}");
+            }
         }
 
-        // Spawn the player first
+        // 💡 Add 1-second delay after enabling objects to ensure joystick & UI initialize
+        Debug.Log("Waiting 1 second before spawning player...");
+        yield return new WaitForSeconds(1f);
+
+        Debug.Log("Spawning player now...");
         SpawnPlayer();
 
-        // Fade out AFTER player has been spawned
         if (fadeImage != null)
         {
             fadeImage.gameObject.SetActive(true);
@@ -105,52 +116,78 @@ public class NetworkManager : MonoBehaviourPunCallbacks
         }
     }
 
-    void SpawnPlayer()
+    private void SpawnPlayer()
     {
+        if (playerPrefab == null)
+        {
+            Debug.LogError("Player Prefab is not assigned.");
+            return;
+        }
+
         Vector3 spawnPosition;
         Quaternion spawnRotation;
 
-        if (spawnLocation != null)
+        if (customSpawnPoint != null)
+        {
+            spawnPosition = customSpawnPoint.position;
+            spawnRotation = customSpawnPoint.rotation;
+        }
+        else if (spawnLocation != null)
         {
             spawnPosition = spawnLocation.position;
             spawnRotation = spawnLocation.rotation;
         }
         else
         {
-            spawnPosition = new Vector3(Random.Range(-2, 2), 0, Random.Range(-2, 2));
+            spawnPosition = new Vector3(Random.Range(-5f, 5f), 1f, Random.Range(-5f, 5f));
             spawnRotation = Quaternion.identity;
         }
 
-        GameObject player = PhotonNetwork.Instantiate("Player", spawnPosition, spawnRotation);
+        // Instantiate player object using PhotonNetwork
+        GameObject player = PhotonNetwork.Instantiate(playerPrefab.name, spawnPosition, spawnRotation);
         Debug.Log("Player spawned at: " + spawnPosition);
 
         if (player.GetComponent<PhotonView>().IsMine)
         {
             localPlayer = player;
 
-            // Assign cameras to player
             if (firstPersonCameraController != null && thirdPersonCameraController != null)
             {
-                // Assuming you want to switch between cameras after spawning
                 firstPersonCameraController.SetTarget(localPlayer.transform);
                 thirdPersonCameraController.SetTarget(localPlayer.transform);
-                Debug.Log("First-person and third-person cameras assigned to player.");
+                Debug.Log("Cameras assigned to player.");
             }
             else
             {
-                Debug.LogError("One or both CameraControllers are not assigned in NetworkManager.");
+                Debug.LogError("CameraControllers not assigned.");
             }
 
-            // Assign joystick to player
-            MobileJoystick joystick = FindObjectOfType<MobileJoystick>();
-            if (joystick != null)
+            // Find joystick under UI_Canvas > In-Game > Joystick
+            GameObject uiCanvas = GameObject.Find("UI_Canvas");
+            if (uiCanvas)
             {
-                localPlayer.GetComponent<PlayerController>().SetJoystick(joystick);
-                Debug.Log("Joystick assigned to player.");
+                Transform inGamePanel = uiCanvas.transform.Find("In-Game");
+                if (inGamePanel)
+                {
+                    MobileJoystick joystick = inGamePanel.transform.Find("Joystick")?.GetComponent<MobileJoystick>();
+                    if (joystick != null)
+                    {
+                        localPlayer.GetComponent<PlayerController>().SetJoystick(joystick);
+                        Debug.Log("Joystick assigned to player.");
+                    }
+                    else
+                    {
+                        Debug.LogWarning("Joystick not found in In-Game panel.");
+                    }
+                }
+                else
+                {
+                    Debug.LogWarning("In-Game panel not found under UI_Canvas.");
+                }
             }
             else
             {
-                Debug.LogError("No MobileJoystick found in scene.");
+                Debug.LogWarning("UI_Canvas not found.");
             }
         }
     }

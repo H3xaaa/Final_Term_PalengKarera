@@ -1422,7 +1422,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &181223507
 Transform:
   m_ObjectHideFlags: 0
@@ -2576,7 +2576,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 351331294}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 8c7bb7f3720b9e245a978b4bcc67a7dc, type: 3}
   m_Name: 
@@ -2967,6 +2967,18 @@ MonoBehaviour:
       - m_Target: {fileID: 1751002797}
         m_TargetAssemblyTypeName: ShoppingUIManager, Assembly-CSharp
         m_MethodName: BuyItem
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+      - m_Target: {fileID: 1406207424}
+        m_TargetAssemblyTypeName: ButtonSwitcher, Assembly-CSharp
+        m_MethodName: CloseDescription
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -3419,7 +3431,7 @@ Light:
     m_Type: 2
     m_Resolution: -1
     m_CustomResolution: -1
-    m_Strength: 1
+    m_Strength: 0.425
     m_Bias: 0.05
     m_NormalBias: 0.4
     m_NearPlane: 0.2
@@ -7920,6 +7932,9 @@ MonoBehaviour:
   objectsToEnableBeforeSpawn:
   - {fileID: 181223506}
   - {fileID: 354200741}
+  playerPrefab: {fileID: 2026153192713596193, guid: 35f3982aed943554598ff3af8be7a394,
+    type: 3}
+  customSpawnPoint: {fileID: 1368415817}
 --- !u!4 &857222643
 Transform:
   m_ObjectHideFlags: 0
@@ -12746,7 +12761,7 @@ Transform:
   m_GameObject: {fileID: 1406207423}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -467.96, y: -245.97, z: 44.18}
+  m_LocalPosition: {x: -478.1, y: -238.5, z: 44.18}
   m_LocalScale: {x: 2.7333033, y: 1.6574751, z: 2.7333033}
   m_ConstrainProportionsScale: 0
   m_Children:

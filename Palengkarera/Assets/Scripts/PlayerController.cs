@@ -24,16 +24,15 @@ public class PlayerController : MonoBehaviour, IPunInstantiateMagicCallback
     private float currentStamina;
     private bool isHoldingRunButton = false;
     private Animator animator;
-    public Transform animationTarget; // Player model with Animator
+    public Transform animationTarget;
 
     private PhotonView photonView;
 
-    private Trait assignedTrait; // for Trait Assigning 
+    private Trait assignedTrait;
 
-    // ✅ Called when the player is instantiated in the network
     public void OnPhotonInstantiate(PhotonMessageInfo info)
     {
-        photonView = GetComponent<PhotonView>(); // Ensure PhotonView is assigned
+        photonView = GetComponent<PhotonView>();
 
         if (photonView.IsMine)
         {
@@ -45,16 +44,15 @@ public class PlayerController : MonoBehaviour, IPunInstantiateMagicCallback
     void Awake()
     {
         rb = GetComponent<Rigidbody>();
-        photonView = GetComponent<PhotonView>(); // ✅ Fix: Assign PhotonView in Awake
+        photonView = GetComponent<PhotonView>();
 
-        if (!photonView.IsMine) // ✅ Only control the local player
+        if (!photonView.IsMine)
         {
-            rb.isKinematic = true; // Disable physics for non-local players
+            rb.isKinematic = true;
             enabled = false;
             return;
         }
 
-        // ✅ Ensure we get the correct Animator from the "Character" child
         Transform characterTransform = transform.Find("Character");
         if (characterTransform)
         {
@@ -104,21 +102,22 @@ public class PlayerController : MonoBehaviour, IPunInstantiateMagicCallback
         }
     }
 
-    // ✅ Assigns the camera to follow this player
     void AssignCamera()
     {
         GameObject mainCamera = GameObject.FindWithTag("MainCamera");
 
         if (mainCamera)
         {
+            cameraTransform = mainCamera.transform;
+
             CameraController cameraController = mainCamera.GetComponent<CameraController>();
             if (cameraController)
             {
-                cameraController.SetTarget(transform); // ✅ Camera follows the player
+                cameraController.SetTarget(transform);
             }
             else
             {
-                mainCamera.transform.SetParent(transform); // Attach camera to player as fallback
+                mainCamera.transform.SetParent(transform);
                 mainCamera.transform.localPosition = new Vector3(0, 2, -4);
             }
         }
@@ -128,7 +127,7 @@ public class PlayerController : MonoBehaviour, IPunInstantiateMagicCallback
         }
     }
 
-    //Buff and Debuff
+    // Buff System
     private List<Buff> activeBuffs = new List<Buff>();
     public void ApplyBuff(Buff buff)
     {
@@ -149,8 +148,7 @@ public class PlayerController : MonoBehaviour, IPunInstantiateMagicCallback
         activeBuffs.Remove(buff);
     }
 
-
-    //Assign Random Trait
+    // Traits
     void Start()
     {
         AssignRandomTrait();
@@ -191,56 +189,53 @@ public class PlayerController : MonoBehaviour, IPunInstantiateMagicCallback
             Debug.Log($"Stamina Depletion Reduced: From {oldStaminaDepletionRate} to {staminaDepletionRate}");
         }
 
-        #if UNITY_EDITOR
+#if UNITY_EDITOR
         UnityEditor.EditorUtility.SetDirty(this);
-        #endif
+#endif
     }
 
-    public Trait GetTrait()
-    {
-        return assignedTrait;
-    }
+    public Trait GetTrait() => assignedTrait;
 
-    public bool HasTrait(string traitName)
-    {
-        return assignedTrait != null && assignedTrait.Name == traitName; 
-    }
-
+    public bool HasTrait(string traitName) =>
+        assignedTrait != null && assignedTrait.Name == traitName;
 
     void Update()
     {
-        if (!photonView.IsMine || joystick == null) return;
+        if (!photonView.IsMine || joystick == null || cameraTransform == null) return;
 
+        // Input from joystick and keyboard
         float horizontal = joystick.Horizontal + (Input.GetKey(KeyCode.A) ? -1f : 0f) + (Input.GetKey(KeyCode.D) ? 1f : 0f);
         float vertical = joystick.Vertical + (Input.GetKey(KeyCode.W) ? 1f : 0f) + (Input.GetKey(KeyCode.S) ? -1f : 0f);
 
-        Vector3 moveInput = new Vector3(horizontal, 0, vertical);
-        moveInput = Quaternion.Euler(0, Camera.main.transform.eulerAngles.y, 0) * moveInput;
+        Vector2 inputVector = new Vector2(horizontal, vertical);
+        if (inputVector.magnitude < 0.1f) return;
+
+        // Camera-relative movement fix
+        Vector3 camForward = cameraTransform.forward;
+        Vector3 camRight = cameraTransform.right;
+        camForward.y = 0f;
+        camRight.y = 0f;
+        camForward.Normalize();
+        camRight.Normalize();
+
+        Vector3 moveInput = camForward * inputVector.y + camRight * inputVector.x;
 
         bool isMoving = moveInput.magnitude > 0.1f;
         bool isHoldingRun = isHoldingRunButton || Input.GetKey(KeyCode.LeftShift);
 
         float speed = isHoldingRun && currentStamina > 0 ? runSpeed : normalSpeed;
-
         Vector3 moveVelocity = moveInput.normalized * speed;
         moveVelocity.y = rb.velocity.y;
 
         rb.velocity = moveVelocity;
 
-        // ✅ **Animation Handling**
+        // Animation
         if (animator != null)
         {
-            if (isMoving)
-            {
-                animator.Play("Walk"); // Play Walk animation immediately when moving
-            }
-            else
-            {
-                animator.Play("Stand"); // Play Stand animation immediately when stopping
-            }
+            animator.Play(isMoving ? "Walk" : "Stand");
         }
 
-        // ✅ **Handle stamina**
+        // Stamina
         if (isHoldingRun)
         {
             currentStamina -= staminaDepletionRate * Time.deltaTime;
@@ -256,7 +251,7 @@ public class PlayerController : MonoBehaviour, IPunInstantiateMagicCallback
             staminaBar.fillAmount = currentStamina / staminaMax;
         }
 
-        // ✅ **Smooth Rotation**
+        // Smooth rotation
         if (isMoving)
         {
             Quaternion toRotation = Quaternion.LookRotation(moveInput);
@@ -264,7 +259,6 @@ public class PlayerController : MonoBehaviour, IPunInstantiateMagicCallback
         }
     }
 
-    // ✅ Restored to fix errors in Spawner and NetworkManager
     public void SetJoystick(MobileJoystick assignedJoystick)
     {
         joystick = assignedJoystick;
