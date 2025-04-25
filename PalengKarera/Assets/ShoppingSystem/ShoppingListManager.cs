@@ -1,6 +1,8 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 using TMPro;
+using Photon.Pun;
 
 public class ShoppingListManager : MonoBehaviour
 {
@@ -74,6 +76,27 @@ public class ShoppingListManager : MonoBehaviour
 
                 break;
             }
+        }
+
+        CheckAllItemsBought();
+    }
+
+    void CheckAllItemsBought()
+    {
+        foreach (var entry in shoppingRequirements)
+        {
+            if (entry.boughtQty < entry.requiredQty)
+            {
+                return; // Still items left to buy
+            }
+        }
+
+        Debug.Log("All items bought. Proceeding to Ranking scene...");
+
+        // Only Master Client should initiate the scene load
+        if (PhotonNetwork.IsMasterClient)
+        {
+            PhotonNetwork.LoadLevel("Ranking");
         }
     }
 }
