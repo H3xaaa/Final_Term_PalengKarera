@@ -84,7 +84,7 @@ public class ShoppingUIManager : MonoBehaviour
 
         if (playerBalance < totalCost)
         {
-            warningText.text = "Not enough balance!";
+            warningText.text = "Not enough money!";
             return;
         }
 
@@ -107,6 +107,6 @@ public class ShoppingUIManager : MonoBehaviour
 
     private void UpdateBalanceDisplay() // NEW
     {
-        balanceText.text = $"Balance: ₱{playerBalance}";
+        balanceText.text = $"Budget: ₱{playerBalance}";
     }
 }

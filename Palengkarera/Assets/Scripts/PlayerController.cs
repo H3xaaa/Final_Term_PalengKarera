@@ -81,7 +81,7 @@ public class PlayerController : MonoBehaviour, IPunInstantiateMagicCallback
             }
 
             staminaBar = uiCanvas.transform.Find("StaminaBar")?.GetComponent<Image>();
-            runButton = uiCanvas.transform.Find("RightSideButtons/RunButton")?.GetComponent<Button>();
+            runButton = uiCanvas.transform.Find("RunButton")?.GetComponent<Button>();
 
             if (runButton)
             {
@@ -208,9 +208,7 @@ public class PlayerController : MonoBehaviour, IPunInstantiateMagicCallback
         float vertical = joystick.Vertical + (Input.GetKey(KeyCode.W) ? 1f : 0f) + (Input.GetKey(KeyCode.S) ? -1f : 0f);
 
         Vector2 inputVector = new Vector2(horizontal, vertical);
-        if (inputVector.magnitude < 0.1f) return;
 
-        // Camera-relative movement fix
         Vector3 camForward = cameraTransform.forward;
         Vector3 camRight = cameraTransform.right;
         camForward.y = 0f;
